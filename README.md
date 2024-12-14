@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/default/img/bixa.png">
+    <img src="assets/default/images/logo-sm.svg">
 </div>
 
 > **Note:**  
