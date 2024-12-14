@@ -226,48 +226,7 @@ class User extends CI_Model
 		return false;
 	}
 
-	function reset_password($email)
-	{
-		$res = $this->fetch_where('email', $email);
-		if($res !== false)
-		{
-			if($res['user_oauth'])
-			{
-				$time = time();
-				$token = char32($email.':'.$res['user_rec'].':'.$time.':'.$res['user_key']);
-				$json = json_encode(['email' => $email, 'token' => $token, 'time' => $time]);
-				$base64 = base64_encode($json);
-				if($this->mailer->is_active())
-				{
-					$param['user_name'] = $res['user_name'];
-					$param['user_email'] = $email;
-					$param['new_password'] = base_url().'reset/password/'.$base64;
-					$this->mailer->send('forget_password', $email, $param);
-					return true;
-				}
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	function reset_user_password($password, $email)
-	{
-		$res = $this->fetch_where('email', $email);
-		if($res !== false)
-		{
-			$rec = char64($res['user_rec'].':'.$password.':'.time().':'.$res['user_key']);
-			$password = char64($password);
-			$res = $this->update(['password' => $password, 'rec' => $rec], ['email' => $email]);
-			if($res !== false)
-			{
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
+	
 
 	function get_name()
 	{
@@ -444,7 +403,7 @@ class User extends CI_Model
 		$res = $this->fetch_if_logged();
 		if($res !== false)
 		{
-			$default = base_url().'assets/'.$this->base->get_template().'/images/user.png';
+			$default = base_url().'assets/'.$this->base->get_template().'/img/user.png';
 			$size = 30;
 			$url = "https://www.gravatar.com/avatar/".md5(strtolower(trim($res['user_email'])))."?d=".urlencode($default)."&s=".$size;
 			$ch = curl_init($url);
@@ -465,7 +424,7 @@ class User extends CI_Model
 		$res = $this->fetch_where('key', $key);
 		if($res !== false)
 		{
-			$default = base_url().'assets/'.$this->base->get_template().'/images/user.png';
+			$default = base_url().'assets/'.$this->base->get_template().'/img/user.png';
 			$size = 30;
 			$url = "https://www.gravatar.com/avatar/".md5(strtolower(trim($res['user_email'])))."?d=".urlencode($default)."&s=".$size;
 			$ch = curl_init($url);
@@ -572,6 +531,82 @@ class User extends CI_Model
 		}
 		return false;
 	}
+	function reset_password($email)
+{
+    $res = $this->fetch_where('email', $email);
+    if($res !== false)
+    {
+        if($res['user_oauth'])
+        {
+            $time = time();
+            // Tạo token ngắn 8 ký tự
+            $token = substr(md5($email.$res['user_rec'].$time.$res['user_key']), 0, 8);
+            
+            // Lưu thông tin vào session để validate sau
+            $reset_data = [
+                'email' => $email,
+                'token' => $token,
+                'time' => $time
+            ];
+            $this->session->set_userdata('reset_data', $reset_data);
+
+            if($this->mailer->is_active())
+            {
+                $param['user_name'] = $res['user_name'];
+                $param['user_email'] = $email;
+                // URL reset ngắn hơn
+                $param['new_password'] = base_url().'reset/'.$token;
+                $this->mailer->send('forget_password', $email, $param);
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+function validate_reset_token($token)
+{
+    $reset_data = $this->session->userdata('reset_data');
+    
+    if(!$reset_data) {
+        return false;
+    }
+
+    if($reset_data['token'] !== $token) {
+        return false; 
+    }
+
+    if(time() > $reset_data['time'] + 3600) {
+        return false;
+    }
+
+    return $reset_data['email'];
+}
+function reset_user_password($password, $email)
+{
+    $res = $this->fetch_where('email', $email);
+    if($res !== false)
+    {
+        $rec = char64($res['user_rec'].':'.$password.':'.time().':'.$res['user_key']); 
+        $password = char64($password);
+        $res = $this->update(
+            [
+                'password' => $password, 
+                'rec' => $rec
+            ], 
+            ['email' => $email]
+        );
+        
+        if($res !== false)
+        {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
 }
 
 ?>

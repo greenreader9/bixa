@@ -36,15 +36,17 @@ class Mailer extends CI_Model
 		return $this->smtp->is_active();
 	}
 
-	function get_template($id, $for = 'user')
-	{
-		$res = $this->fetch(['id' => $id, 'for' => $for]);
-		if($res !== false)
-		{
-			return $res;
-		}
-		return false;
-	}
+function get_template($id, $for) 
+{
+    $this->db->select('*');
+    $this->db->from('is_email');
+    $this->db->where('email_id', $id);
+    $this->db->where('email_for', $for);
+    $query = $this->db->get();
+    
+    return ($query->num_rows() > 0) ? $query->row_array() : false;
+}
+
 
 	function send($id, $email, $array, $for = 'user')
 	{
@@ -87,17 +89,36 @@ class Mailer extends CI_Model
 		}
 		return false;
 	}
+function get_user_templates()
+{
+    $this->db->where('email_for', 'user');
+    $query = $this->db->get('is_email');
+    
+    if($query->num_rows() > 0) {
+        return $query->result_array();
+    }
+    return false;
+}
 
-	function get_user_templates()
-	{
-		$res = $this->fetch(['for' => 'user'], false);
-		if($res !== false)
-		{
-			return $res;
-		}
-		return false;
-	}
+function get_admin_templates() 
+{
+    $this->db->where('email_for', 'admin');
+    $query = $this->db->get('is_email'); 
+    
+    if($query->num_rows() > 0) {
+        return $query->result_array();
+    }
+    return false;
+}
 
+function get_all_templates()
+{
+    $query = $this->db->get('is_email');
+    if($query->num_rows() > 0) {
+        return $query->result_array(); 
+    }
+    return false;
+}
 	function set_template($data, $id)
 	{
 		$res = $this->update($data, ['id' => $id, 'for' => 'user']);
@@ -143,6 +164,19 @@ class Mailer extends CI_Model
 			return false;
 		}
 	}
+	function fetch_template($id)
+{
+    $res = $this->base->fetch(
+        'is_email', 
+        ['email_id' => $id],
+        ''
+    );
+    if(count($res) > 0)
+    {
+        return $res[0];
+    }
+    return false;
+}
 }
 
 ?>

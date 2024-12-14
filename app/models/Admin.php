@@ -81,44 +81,38 @@ class Admin extends CI_Model
 		return false;
 	}
 
-	function reset_password($email)
-	{
-		$res = $this->fetch_where('email', $email);
-		if($res !== false)
-		{
-			$time = time();
-			$token = char32($email.':'.$res['admin_rec'].':'.$time.':'.$res['admin_key']);
-			$json = json_encode(['email' => $email, 'token' => $token, 'time' => $time]);
-			$base64 = base64_encode($json);
-			if($this->mailer->is_active())
-			{
-				$param['user_name'] = $res['admin_name'];
-				$param['user_email'] = $email;
-				$param['new_password'] = base_url().'admin/reset/password/'.$base64;
-				$this->mailer->send('forget_password', $email, $param, 'admin');
-				return true;
-			}
-			return true;
-		}
-		return false;
-	}
+function reset_password($email)
+{
+    $res = $this->fetch_where('email', $email);
+    if($res !== false)
+    {
+        $time = time();
+        // Tạo token ngắn 8 ký tự
+        $token = substr(md5($email.$res['admin_rec'].$time.$res['admin_key']), 0, 8);
+        
+        // Lưu thông tin vào session 
+        $reset_data = [
+            'email' => $email,
+            'token' => $token,
+            'time' => $time
+        ];
+        $this->session->set_userdata('admin_reset_data', $reset_data);
 
-	function reset_admin_password($password, $email)
-	{
-		$res = $this->fetch_where('email', $email);
-		if($res !== false)
-		{
-			$rec = char64($res['admin_rec'].':'.$password.':'.time().':'.$res['admin_key']);
-			$password = char64($password);
-			$res = $this->update(['password' => $password, 'rec' => $rec], ['email' => $email]);
-			if($res !== false)
-			{
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
+        if($this->mailer->is_active())
+        {
+            $param['user_name'] = $res['admin_name'];
+            $param['user_email'] = $email;
+            // URL reset ngắn hơn
+            $param['new_password'] = base_url().'admin/reset/'.$token;
+            $this->mailer->send('forget_password', $email, $param, 'admin');
+            return true;
+        }
+        return true;
+    }
+    return false;
+}
+
+	
 
 	function get_name()
 	{
@@ -201,7 +195,7 @@ class Admin extends CI_Model
 		$res = $this->fetch_if_logged();
 		if($res !== false)
 		{
-			$default = base_url().'assets/'.$this->base->get_template().'/images/user.png';
+			$default = base_url().'assets/'.$this->base->get_template().'/img/user.png';
 			$size = 30;
 			$url = "https://www.gravatar.com/avatar/".md5(strtolower(trim($res['admin_email'])))."?d=".urlencode($default)."&s=".$size;
 			$ch = curl_init($url);
@@ -276,6 +270,53 @@ class Admin extends CI_Model
 		}
 		return false;
 	}
+
+
+function validate_reset_token($token)
+{
+    // Lấy data từ session
+    $reset_data = $this->session->userdata('admin_reset_data');
+    
+    if(!$reset_data) {
+        return false;
+    }
+
+    // Kiểm tra token có khớp không
+    if($reset_data['token'] !== $token) {
+        return false;
+    }
+
+    // Kiểm tra thời gian (1 giờ)
+    if(time() > $reset_data['time'] + 3600) {
+        return false;
+    }
+
+    return $reset_data['email'];
+}
+
+function reset_admin_password($password, $email)
+{
+    $res = $this->fetch_where('email', $email);
+    if($res !== false)
+    {
+        $rec = char64($res['admin_rec'].':'.$password.':'.time().':'.$res['admin_key']);
+        $password = char64($password);
+        $res = $this->update(
+            [
+                'password' => $password,
+                'rec' => $rec
+            ],
+            ['email' => $email]
+        );
+        
+        if($res !== false)
+        {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
 }
 
 ?>

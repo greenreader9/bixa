@@ -387,84 +387,71 @@ class U extends CI_Controller
 		}
 	}
 
-	function reset_password($token)
-	{
-		if(!$this->user->is_logged())
-		{
-			$json = base64_decode($token);
-			$arr = json_decode($json, true);
-			$email = $arr['email'];
-			$key = $arr['token'];
-			$time = $arr['time'];
-			$user = $this->user->fetch_where('email', $email);
-			if(time() > $time + 3600)
-			{
-				$this->session->set_flashdata('msg', json_encode([0, $this->base->text('reset_token_expired', 'error')]));
-				redirect('login');
-			}
-			elseif($user !== false)
-			{
-				$verify = char32($email.':'.$user['user_rec'].':'.$time.':'.$user['user_key']);
-				if($verify == $key)
-				{
-					if($this->input->post('reset'))
-					{
-						$this->fv->set_rules('password', $this->base->text('password', 'label'), ['trim', 'required']);
-						$this->fv->set_rules('password1', $this->base->text('confirm_password', 'label'), ['trim', 'required', 'matches[password]']);
-						if($this->fv->run() === true)
-						{
-							$password = $this->input->post('password');
-							$res = $this->user->reset_user_password($password, $email);
-							if($res !== false)
-							{
-								$this->session->set_flashdata('msg', json_encode([1, $this->base->text('reset_msg', 'success')]));
-								redirect('login');
-							}
-							else
-							{
-								$this->session->set_flashdata('msg', json_encode([0, $this->base->text('error_occured', 'error')]));
-								redirect('login');
-							}
-						}
-						else
-						{
-							if(validation_errors() !== '')
-							{
-								$this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-							}
-							else
-							{
-								$this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
-							}
-							redirect('login');
-						}
-					}
-					else
-					{
-						$data['title'] = 'reset_password';
-						$data['token'] = $token;
-						$this->load->view($this->base->get_template().'/form/includes/user/header.php', $data);
-						$this->load->view($this->base->get_template().'/form/user/reset_password.php');
-						$this->load->view($this->base->get_template().'/form/includes/user/footer.php');	
-					}
-				}
-				else
-				{
-					$this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_token', 'error')]));
-					redirect('login');
-				}
-			}
-			else
-			{
-				$this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_token', 'error')]));
-				redirect('login');
-			}
-		}
-		else
-		{
-			redirect('user');
-		}
-	}
+	function reset_password($token = '')
+{
+    if(!$this->user->is_logged())
+    {
+        // Validate token và lấy email
+        $email = $this->user->validate_reset_token($token);
+        
+        if($email === false)
+        {
+            $this->session->set_flashdata('msg', json_encode([0, $this->base->text('reset_token_expired', 'error')]));
+            redirect('login');
+        }
+
+        if($this->input->post('reset'))
+        {
+            $this->fv->set_rules('password', $this->base->text('password', 'label'), ['trim', 'required']);
+            $this->fv->set_rules('password1', $this->base->text('confirm_password', 'label'), ['trim', 'required', 'matches[password]']);
+            
+            if($this->fv->run() === true)
+            {
+                $password = $this->input->post('password');
+                $res = $this->user->reset_user_password($password, $email);
+                
+                if($res !== false)
+                {
+                    // Xóa session data sau khi reset thành công
+                    $this->session->unset_userdata('reset_data');
+                    
+                    $this->session->set_flashdata('msg', json_encode([1, $this->base->text('reset_msg', 'success')]));
+                    redirect('login');
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, $this->base->text('error_occured', 'error')]));
+                    redirect('login');
+                }
+            }
+            else
+            {
+                if(validation_errors() !== '')
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
+                }
+                redirect('login');
+            }
+        }
+        else
+        {
+            $data['title'] = 'reset_password';
+            $data['token'] = $token;
+            
+            $this->load->view($this->base->get_template().'/form/includes/user/header.php', $data);
+            $this->load->view($this->base->get_template().'/form/user/reset_password.php');
+            $this->load->view($this->base->get_template().'/form/includes/user/footer.php');
+        }
+    }
+    else
+    {
+        redirect('user');
+    }
+}
 
 	function logout($status = 1, $msg = '') {
     if($this->user->logout()) {
@@ -1745,10 +1732,8 @@ function view_account($id, $action = null, $path = null)
 	{
 		if($this->user->is_logged())
 		{
-                        $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
-						$this->load->view($this->base->get_template().'/page/includes/user/navbar');
-						$this->load->view($this->base->get_template().'/page/user/upgrade');
-						$this->load->view($this->base->get_template().'/page/includes/user/footer');		}
+$this->load->view($this->base->get_template().'/page/includes/user/header', $data);						$this->load->view($this->base->get_template().'/page/includes/user/navbar');			$this->load->view($this->base->get_template().'/page/user/upgrade');									$this->load->view($this->base->get_template().'/page/includes/user/footer');
+		}
 		else
 		{
 			redirect('login');

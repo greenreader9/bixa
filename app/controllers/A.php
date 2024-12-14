@@ -371,84 +371,7 @@ class A extends CI_Controller
 		}
 	}
 
-	function reset_password($token)
-	{
-		if(!$this->admin->is_logged())
-		{
-			$json = base64_decode($token);
-			$arr = json_decode($json, true);
-			$email = $arr['email'];
-			$key = $arr['token'];
-			$time = $arr['time'];
-			$admin = $this->admin->fetch_where('email', $email);
-			if(time() > $time + 3600)
-			{
-				$this->session->set_flashdata('msg', json_encode([0, 'Password reset token expired.']));
-				redirect('admin/login');
-			}
-			elseif($admin !== false)
-			{
-				$verify = char32($email.':'.$admin['admin_rec'].':'.$time.':'.$admin['admin_key']);
-				if($verify == $key)
-				{
-					if($this->input->post('reset'))
-					{
-						$this->fv->set_rules('password', 'Password', ['trim', 'required']);
-						$this->fv->set_rules('password1', 'Confirm Password', ['trim', 'required', 'matches[password]']);
-						if($this->fv->run() === true)
-						{
-							$password = $this->input->post('password');
-							$res = $this->admin->reset_admin_password($password, $email);
-							if($res !== false)
-							{
-								$this->session->set_flashdata('msg', json_encode([1, 'Password reset successfully.']));
-								redirect('admin/login');
-							}
-							else
-							{
-								$this->session->set_flashdata('msg', json_encode([0, 'An error occured. Try again later.']));
-								redirect('admin/login');
-							}
-						}
-						else
-						{
-							if(validation_errors() !== '')
-							{
-								$this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-							}
-							else
-							{
-								$this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
-							}
-							redirect('admin/login');
-						}
-					}
-					else
-					{
-						$data['title'] = 'Reset Password';
-						$data['token'] = $token;
-						$this->load->view($this->base->get_template().'/form/includes/admin/header.php', $data);
-						$this->load->view($this->base->get_template().'/form/admin/reset_password.php');
-						$this->load->view($this->base->get_template().'/form/includes/admin/footer.php');	
-					}
-				}
-				else
-				{
-					$this->session->set_flashdata('msg', json_encode([0, 'Invalid password reset token.']));
-					redirect('admin/login');
-				}
-			}
-			else
-			{
-				$this->session->set_flashdata('msg', json_encode([0, 'Invalid password reset token.']));
-				redirect('admin/login');
-			}
-		}
-		else
-		{
-			redirect('admin');
-		}
-	}
+
 
 	function logout($status = 1, $msg = '')
 	{
@@ -1069,80 +992,104 @@ function api_settings()
 		}
 	}
 
-	function email_templates()
-	{
-		if($this->admin->is_logged())
-		{
-			$data['title'] = 'Email Templates';
-			$data['active'] = 'settings';
-			$data['list'] = $this->mailer->get_user_templates();
-			
-			$this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
-			$this->load->view($this->base->get_template().'/page/includes/admin/navbar');
-			$this->load->view($this->base->get_template().'/page/admin/email_templates');
-			$this->load->view($this->base->get_template().'/page/includes/admin/footer');
-		}
-		else
-		{
-			redirect('admin/login');
-		}
-	}
+function email_templates()
+{
+    if($this->admin->is_logged())
+    {
+        // Lấy type từ URL, mặc định là 'user' nếu không có
+        $type = $this->input->get('type');
+        
+        $data['title'] = 'Email Templates';
+        $data['active'] = ($type == 'admin') ? 'admin' : 'user';
+        
+        // Lấy tất cả template 
+        $data['list'] = $this->mailer->get_all_templates();
+        
+        // Load views
+        $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
+        $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
+        $this->load->view($this->base->get_template().'/page/admin/email_templates');
+        $this->load->view($this->base->get_template().'/page/includes/admin/footer');
+    }
+    else
+    {
+        redirect('admin/login');
+    }
+}
 
-	function edit_email($id)
-	{
-		if($this->admin->is_logged())
-		{
-			$id = $this->security->xss_clean($id);
-			if($this->input->post('update'))
-			{
-				$this->fv->set_rules('subject', 'Subject', ['trim', 'required']);
-				$this->fv->set_rules('content', 'Content', ['trim', 'required']);
-				if($this->fv->run() === true)
-				{
-					$subject = $this->input->post('subject');
-					$content = $this->input->post('content', false);
-					$res = $this->mailer->set_template(['subject' => $subject, 'content' => $content], $id);
-					if($res)
-					{
-						$this->session->set_flashdata('msg', json_encode([1, 'Email template updated successfully.']));
-						redirect("email/edit/$id");
-					}
-					else
-					{
-						$this->session->set_flashdata('msg', json_encode([0, 'An error occured. Try again later.']));
-						redirect("email/edit/$id");
-					}
-				}
-				else
-				{
-					if(validation_errors() !== '')
-					{
-							$this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-					}
-					else
-					{
-						$this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
-					}
-					redirect("email/edit/$id");
-				}
-			}
-			else
-			{
-				$data['title'] = 'Edit Email';
-				$data['active'] = 'email';
-				$data['email'] = $this->mailer->get_template($id);
-				
-				$this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
-				$this->load->view($this->base->get_template().'/page/includes/admin/navbar');
-				$this->load->view($this->base->get_template().'/page/admin/edit_email');
-				$this->load->view($this->base->get_template().'/page/includes/admin/footer');
-			}
-		}
-		else
-		{
-			redirect('admin/login');
-		}
-	}
+function edit_email($id)
+{
+    if($this->admin->is_logged())
+    {
+        $id = $this->security->xss_clean($id);
+        // Lấy type từ URL để biết đang edit template loại nào
+        $type = $this->input->get('type');
+        $for = ($type == 'admin') ? 'admin' : 'user';
+        
+        if($this->input->post('update'))
+        {
+            $this->fv->set_rules('subject', 'Subject', ['trim', 'required']);
+            $this->fv->set_rules('content', 'Content', ['trim', 'required']);
+            
+            if($this->fv->run() === true)
+            {
+                $subject = $this->input->post('subject');
+                $content = $this->input->post('content', false);
+                
+                $res = $this->mailer->set_template([
+                    'subject' => $subject,
+                    'content' => $content
+                ], $id);
+
+                if($res)
+                {
+                    $this->session->set_flashdata('msg', json_encode([1, 'Email template updated successfully.']));
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, 'An error occurred. Try again later.']));
+                }
+                redirect("email/edit/$id?type=$for");
+            }
+            else
+            {
+                if(validation_errors() !== '')
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
+                }
+                redirect("email/edit/$id?type=$for");
+            }
+        }
+        else
+        {
+            // Lấy template theo ID và loại (admin/user)
+            $data['title'] = 'Edit '.ucfirst($for).' Email Template';
+            $data['active'] = 'email';
+            $data['email'] = $this->mailer->get_template($id, $for);
+            
+            // Kiểm tra template có tồn tại không
+            if($data['email'] === false)
+            {
+                $this->session->set_flashdata('msg', json_encode([0, 'Template not found']));
+                redirect("email/templates?type=$for");
+            }
+
+            // Load views
+            $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
+            $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
+            $this->load->view($this->base->get_template().'/page/admin/edit_email');
+            $this->load->view($this->base->get_template().'/page/includes/admin/footer');
+        }
+    }
+    else
+    {
+        redirect('admin/login');
+    }
+}
 
 	function tickets()
 	{
@@ -1844,6 +1791,71 @@ function api_settings()
 			redirect('admin/login');
 		}
 	}
+	function reset_password($token = '')
+{
+    if(!$this->admin->is_logged())
+    {
+        // Validate token và lấy email
+        $email = $this->admin->validate_reset_token($token);
+        
+        if($email === false)
+        {
+            $this->session->set_flashdata('msg', json_encode([0, 'Password reset token expired.']));
+            redirect('admin/login');
+        }
+
+        if($this->input->post('reset'))
+        {
+            $this->fv->set_rules('password', 'Password', ['trim', 'required']);
+            $this->fv->set_rules('password1', 'Confirm Password', ['trim', 'required', 'matches[password]']);
+            
+            if($this->fv->run() === true)
+            {
+                $password = $this->input->post('password');
+                $res = $this->admin->reset_admin_password($password, $email);
+                
+                if($res !== false)
+                {
+                    // Xóa session data sau khi reset thành công
+                    $this->session->unset_userdata('admin_reset_data');
+                    
+                    $this->session->set_flashdata('msg', json_encode([1, 'Password reset successfully.']));
+                    redirect('admin/login');
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, 'An error occured. Try again later.']));
+                    redirect('admin/login');
+                }
+            }
+            else
+            {
+                if(validation_errors() !== '')
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+                }
+                else
+                {
+                    $this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
+                }
+                redirect('admin/login');
+            }
+        }
+        else
+        {
+            $data['title'] = 'Reset Password';
+            $data['token'] = $token;
+            
+            $this->load->view($this->base->get_template().'/form/includes/admin/header.php', $data);
+            $this->load->view($this->base->get_template().'/form/admin/reset_password.php');
+            $this->load->view($this->base->get_template().'/form/includes/admin/footer.php');
+        }
+    }
+    else
+    {
+        redirect('admin');
+    }
+}
 }
 
 ?>
