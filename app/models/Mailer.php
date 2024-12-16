@@ -119,15 +119,21 @@ function get_all_templates()
     }
     return false;
 }
-	function set_template($data, $id)
-	{
-		$res = $this->update($data, ['id' => $id, 'for' => 'user']);
-		if($res !== false)
-		{
-			return true;
-		}
-		return false;
-	}
+	function set_template($data, $id, $for) 
+{
+    $res = $this->db->where('email_id', $id)
+                    ->where('email_for', $for)
+                    ->update('is_email', [
+                        'email_subject' => $data['subject'],
+                        'email_content' => $data['content']
+                    ]);
+    
+    if($res !== false)
+    {
+        return true;
+    }
+    return false;
+}
 
 	private function update($data, $where)
 	{

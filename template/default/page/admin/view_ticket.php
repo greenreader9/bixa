@@ -72,7 +72,7 @@
                         <div class="card-header">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <img src="<?= base_url() ?>assets/<?= $this->base->get_template() ?>/img/user.png" 
+                                    <img src="<?= base_url() ?>assets/<?= $this->base->get_template() ?>/images/user.png" 
                                          class="avatar-xs rounded-circle me-2">
                                     <span class="fw-medium"><?= $this->ticket->get_user_name($ticket['ticket_for']) ?></span>
                                 </div>
@@ -96,10 +96,10 @@
                                     <?php 
                                         if ($reply['reply_by'] !== $this->admin->get_key()): 
                                             $reply_name = $this->ticket->get_user_name($reply['reply_by']);
-                                            $ico = base_url().'assets/'. $this->base->get_template(). '/img/user.png';
+                                            $ico = base_url().'assets/'. $this->base->get_template(). '/images/user.png';
                                         else:
                                             $reply_name = $this->ticket->get_admin_name($reply['reply_by']);
-                                            $ico = base_url().'assets/'. $this->base->get_template(). '/img/fav.png';
+                                            $ico = base_url().'assets/'. $this->base->get_template(). '/images/logo-sm.svg';
                                         endif 
                                     ?>
                                     <div class="card border mb-3">

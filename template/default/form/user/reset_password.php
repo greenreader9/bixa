@@ -32,7 +32,7 @@
                                         <label class="form-label"><?= $this->base->text('confirm_password', 'label') ?></label>
                                         <div class="input-group auth-pass-inputgroup">
     <input type="password" class="form-control" id="password1" 
-           placeholder="<?= $this->base->text('password', 'label') ?>" 
+           placeholder="<?= $this->base->text('confirm_password', 'label') ?>" 
            name="password1">
     <button class="btn btn-light shadow-none ms-0" type="button" data-toggle="password1">
         <i class="fa fa-eye"></i>

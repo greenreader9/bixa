@@ -24,6 +24,7 @@
                    <div class="card">
                        <div class="card-body">
                            <?= form_open('email/edit/'.$email['email_id'].'?type='.$active) ?>
+						       <input type="hidden" name="type" value="<?= $active ?>">
                                <!-- Subject Field -->
                                <div class="mb-3">
                                    <div class="d-flex align-items-center mb-2">

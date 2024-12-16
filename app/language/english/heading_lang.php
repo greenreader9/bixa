@@ -31,3 +31,6 @@ $lang['home'] = 'Home';
 $lang['community_forum'] = 'Community Forum';
 $lang['domain_tools'] = 'Domain Tools';
 $lang['connection_details'] = 'Connection Details';
+$lang['to_screen'] = 'to the sign in screen';
+$lang['send_me_back'] = 'send me back';
+$lang['reset_password'] = 'Reset account password';

@@ -1019,76 +1019,83 @@ function email_templates()
 
 function edit_email($id)
 {
-    if($this->admin->is_logged())
-    {
-        $id = $this->security->xss_clean($id);
-        // Lấy type từ URL để biết đang edit template loại nào
-        $type = $this->input->get('type');
-        $for = ($type == 'admin') ? 'admin' : 'user';
-        
-        if($this->input->post('update'))
-        {
-            $this->fv->set_rules('subject', 'Subject', ['trim', 'required']);
-            $this->fv->set_rules('content', 'Content', ['trim', 'required']);
-            
-            if($this->fv->run() === true)
-            {
-                $subject = $this->input->post('subject');
-                $content = $this->input->post('content', false);
-                
-                $res = $this->mailer->set_template([
-                    'subject' => $subject,
-                    'content' => $content
-                ], $id);
+   if($this->admin->is_logged())
+   {
+       $id = $this->security->xss_clean($id);
+       
+       // Get type from URL param, default to 'user' if not set
+       $type = $this->input->get('type', true) ?: 'user';
+       
+       if($this->input->post('update'))
+       {
+           $this->fv->set_rules('subject', 'Subject', ['trim', 'required']);
+           $this->fv->set_rules('content', 'Content', ['trim', 'required']);
+           
+           if($this->fv->run() === true)
+           {
+               $subject = $this->input->post('subject');
+               $content = $this->input->post('content', false);
+               
+               // Get type from hidden field in form
+               $for = $this->input->post('type');
+               
+               $res = $this->mailer->set_template(
+                   [
+                       'subject' => $subject,
+                       'content' => $content
+                   ],
+                   $id,
+                   $for // Pass type to set_template
+               );
 
-                if($res)
-                {
-                    $this->session->set_flashdata('msg', json_encode([1, 'Email template updated successfully.']));
-                }
-                else
-                {
-                    $this->session->set_flashdata('msg', json_encode([0, 'An error occurred. Try again later.']));
-                }
-                redirect("email/edit/$id?type=$for");
-            }
-            else
-            {
-                if(validation_errors() !== '')
-                {
-                    $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-                }
-                else
-                {
-                    $this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
-                }
-                redirect("email/edit/$id?type=$for");
-            }
-        }
-        else
-        {
-            // Lấy template theo ID và loại (admin/user)
-            $data['title'] = 'Edit '.ucfirst($for).' Email Template';
-            $data['active'] = 'email';
-            $data['email'] = $this->mailer->get_template($id, $for);
-            
-            // Kiểm tra template có tồn tại không
-            if($data['email'] === false)
-            {
-                $this->session->set_flashdata('msg', json_encode([0, 'Template not found']));
-                redirect("email/templates?type=$for");
-            }
-
-            // Load views
-            $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
-            $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
-            $this->load->view($this->base->get_template().'/page/admin/edit_email');
-            $this->load->view($this->base->get_template().'/page/includes/admin/footer');
-        }
-    }
-    else
-    {
-        redirect('admin/login');
-    }
+               if($res)
+               {
+                   $this->session->set_flashdata('msg', json_encode([1, 'Email template updated successfully.']));
+               }
+               else
+               {
+                   $this->session->set_flashdata('msg', json_encode([0, 'An error occurred. Try again later.']));
+               }
+               redirect("email/edit/$id?type=$for");
+           }
+           else
+           {
+               if(validation_errors() !== '')
+               {
+                   $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+               }
+               else
+               {
+                   $this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields.']));
+               }
+               redirect("email/edit/$id?type=$type"); 
+           }
+       }
+       else
+       {
+           // Load template based on ID and type
+           $email_template = $this->mailer->get_template($id, $type);
+           
+           if($email_template === false)
+           {
+               $this->session->set_flashdata('msg', json_encode([0, 'Template not found']));
+               redirect('email/templates?type=' . $type);
+           }
+           
+           $data['title'] = 'Edit ' . ucfirst($type) . ' Email Template';
+           $data['active'] = $type; // For highlighting correct tab
+           $data['email'] = $email_template;
+           
+           $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
+           $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
+           $this->load->view($this->base->get_template().'/page/admin/edit_email');
+           $this->load->view($this->base->get_template().'/page/includes/admin/footer');
+       }
+   }
+   else
+   {
+       redirect('admin/login');
+   }
 }
 
 	function tickets()
