@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/default/images/logo-sm.svg" width="64px">
+    <img src="assets/default/images/logo-sm.svg" width="250px">
 </div>
 
 > **Note:**  
