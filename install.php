@@ -422,7 +422,7 @@ $files_to_delete = [
                                                     <h5 class="alert-heading"><i class="bx bx-info-circle me-2"></i>System Requirements</h5>
                                                     <p class="mb-2">Please ensure your system meets the following requirements:</p>
                                                     <ul class="list-unstyled mb-0">
-                                                        <li><i class="bx bx-check me-2"></i>PHP version 7.4 or higher</li>
+                                                        <li><i class="bx bx-check me-2"></i>PHP version 8.1 or higher</li>
                                                         <li><i class="bx bx-check me-2"></i>MySQL version 5.7 or higher</li>
                                                         <li><i class="bx bx-check me-2"></i>PHP Extensions: mysqli, curl, json</li>
                                                         <li><i class="bx bx-check me-2"></i>Write permissions for app/config and app/logs directories</li>
