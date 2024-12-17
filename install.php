@@ -1,197 +1,142 @@
 <?php
-ob_start();
-session_start();
+if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
+    $base_url_value = $_POST['base_url'];
+    $cookie_prefix = $_POST['cookie_prefix'];
+    $csrf = $_POST['csrf'];
+    if (strpos($cookie_prefix, '_') !== strlen($cookie_prefix) - 1) {
+        $cookie_prefix = $cookie_prefix . '_';
+    }
+    if ($csrf == 0) {
+        $csrf_value = 'FALSE';
+    } else {
+        $csrf_value = 'TRUE';
+    }
+    $file = file_get_contents('https://raw.githubusercontent.com/bixacloud/bixa/dev/app/config/config.php');
+    $data = str_replace('BASE_URL_VALUE', $base_url_value, $file);
+    $data = str_replace('COOKIE_PREFIX_VALUE', $cookie_prefix, $data);
+    $data = str_replace('CSRF_PROTECTION_MODE', $csrf_value, $data);
+    $res = file_put_contents(__DIR__ . '/app/config/config.php', $data);
+    $_SESSION['msg'] = json_encode(['success', 'Basic settings changed successfully.']);
+    header('location: ' . $base_url . 'install.php?step=2');
+} elseif (isset($_GET['step']) and $_GET['step'] == 2 and isset($_POST['submit'])) {
+    $hostname = $_POST['hostname'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $database = $_POST['database'];
 
-// Set base URL
-if (isset($_SERVER['HTTPS'])) {
-    $protocol = 'https://';
-} else {
-    $protocol = 'http://';
-}
-$hostname = $_SERVER['HTTP_HOST'];
-$base_path = str_replace(['install.php', '?step=', '1', '2', '3'], '', $_SERVER['REQUEST_URI']);
-$base_url = $protocol . $hostname . $base_path;
-
-// Set page title based on installation step
-$titles = [
-    1 => 'Basic Settings - BIXA Installation',
-    2 => 'Database Settings - BIXA Installation',
-    3 => 'Installation Complete - BIXA Installation',
-    'default' => 'Welcome to BIXA Installation'
-];
-$title = isset($_GET['step']) ? ($titles[$_GET['step']] ?? $titles['default']) : $titles['default'];
-
-// Handle form submissions first
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_GET['step']) && $_GET['step'] == 1) {
-        try {
-            // Process basic settings
-            $base_url_value = filter_var($_POST['base_url'], FILTER_SANITIZE_URL);
-            $cookie_prefix = filter_var($_POST['cookie_prefix'], FILTER_SANITIZE_STRING);
-            $csrf = (int)$_POST['csrf'];
-
-            // Validate base URL
-            if (!filter_var($base_url_value, FILTER_VALIDATE_URL)) {
-                throw new Exception('Invalid base URL format.');
-            }
-
-            // Ensure cookie prefix ends with underscore
-            if (strpos($cookie_prefix, '_') !== strlen($cookie_prefix) - 1) {
-                $cookie_prefix = $cookie_prefix . '_';
-            }
-
-            // Set CSRF value
-            $csrf_value = $csrf == 0 ? 'FALSE' : 'TRUE';
-
-            // Update config file
-            $config_template = file_get_contents('https://raw.githubusercontent.com/mahtab2003/xera/dev/app/config/config.php');
-            if ($config_template === false) {
-                throw new Exception('Could not fetch configuration template.');
-            }
-
-            $config_content = str_replace(
-                ['BASE_URL_VALUE', 'COOKIE_PREFIX_VALUE', 'CSRF_PROTECTION_MODE'],
-                [$base_url_value, $cookie_prefix, $csrf_value],
-                $config_template
-            );
-
-            $config_dir = __DIR__ . '/app/config';
-            if (!is_dir($config_dir) && !mkdir($config_dir, 0755, true)) {
-                throw new Exception('Could not create config directory.');
-            }
-
-            $config_path = $config_dir . '/config.php';
-            if (file_put_contents($config_path, $config_content) === false) {
-                throw new Exception('Could not write configuration file.');
-            }
-
-            $_SESSION['msg'] = json_encode(['success', 'Basic settings have been configured successfully.']);
-            header('Location: install.php?step=2');
-            exit;
-
-        } catch (Exception $e) {
-            $_SESSION['msg'] = json_encode(['danger', 'Configuration Error: ' . $e->getMessage()]);
-            header('Location: install.php?step=1');
-            exit;
+    try {
+        // Tạo kết nối
+        $mysqli = new mysqli($hostname, $username, $password);
+        if ($mysqli->connect_error) {
+            throw new Exception("Could not connect to MySQL: " . $mysqli->connect_error);
         }
-    } elseif (isset($_GET['step']) && $_GET['step'] == 2) {
+
+        // Set charset
+        if (!$mysqli->set_charset("utf8mb4")) {
+            throw new Exception("Error setting UTF-8 charset: " . $mysqli->error);
+        }
+
+        // Tạo database nếu chưa tồn tại
+        $sql = "CREATE DATABASE IF NOT EXISTS `" . $mysqli->real_escape_string($database) . "`
+                CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+        if (!$mysqli->query($sql)) {
+            throw new Exception("Could not create database: " . $mysqli->error);
+        }
+
+        // Chọn database
+        if (!$mysqli->select_db($database)) {
+            throw new Exception("Could not select database: " . $mysqli->error);
+        }
+
+        // Đọc file SQL
+        $sql_file = __DIR__ . '/database.sql';
+        if (!file_exists($sql_file)) {
+            throw new Exception("SQL file not found: database.sql");
+        }
+
+        $sql_content = file_get_contents($sql_file);
+        if ($sql_content === false) {
+            throw new Exception("Could not read SQL file");
+        }
+
+        // Split SQL thành các statements riêng biệt
+        $queries = array();
+        $current_query = '';
+
+        foreach (explode("\n", $sql_content) as $line) {
+            $line = trim($line);
+            
+            // Bỏ qua comments và dòng trống
+            if (empty($line) || strpos($line, '--') === 0 || strpos($line, '#') === 0) {
+                continue;
+            }
+
+            $current_query .= $line . ' ';
+            
+            if (substr($line, -1) === ';') {
+                $queries[] = $current_query;
+                $current_query = '';
+            }
+        }
+
+        // Bắt đầu transaction
+        $mysqli->begin_transaction();
+
         try {
-            // Process database settings
-            $hostname = filter_var($_POST['hostname'], FILTER_SANITIZE_STRING);
-            $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
-            $password = $_POST['password'];
-            $database = filter_var($_POST['database'], FILTER_SANITIZE_STRING);
-
-            // Create connection without database
-            $mysqli = new mysqli($hostname, $username, $password);
-            if ($mysqli->connect_error) {
-                throw new Exception('Database connection failed: ' . $mysqli->connect_error);
-            }
-
-            // Create database if not exists
-            $create_db = "CREATE DATABASE IF NOT EXISTS `$database` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-            if (!$mysqli->query($create_db)) {
-                throw new Exception('Failed to create database: ' . $mysqli->error);
-            }
-
-            // Select the database
-            if (!$mysqli->select_db($database)) {
-                throw new Exception('Failed to select database: ' . $mysqli->error);
-            }
-
-            // Import schema
-            $sql_file = __DIR__ . '/database.sql';
-            if (!file_exists($sql_file)) {
-                throw new Exception('SQL file not found. Please ensure database.sql exists.');
-            }
-
-            $sql_content = file_get_contents($sql_file);
-            if ($sql_content === false) {
-                throw new Exception('Failed to read SQL file.');
-            }
-
-            // Split SQL file into individual queries
-            $queries = array_filter(
-                array_map(
-                    'trim',
-                    explode(';', $sql_content)
-                ),
-                'strlen'
-            );
-
-            // Execute queries within transaction
-            $mysqli->begin_transaction();
-
-            try {
-                foreach ($queries as $query) {
-                    if (!empty($query) && !$mysqli->query($query)) {
-                        throw new Exception('Query failed: ' . $mysqli->error . ' Query: ' . $query);
+            // Thực thi từng câu query
+            foreach ($queries as $sql) {
+                if (!empty(trim($sql))) {
+                    if (!$mysqli->query($sql)) {
+                        throw new Exception("Error executing SQL: " . $mysqli->error);
                     }
                 }
-                
-                // If all queries successful, commit transaction
-                $mysqli->commit();
-
-                // Update database configuration
-                $db_template = file_get_contents('https://raw.githubusercontent.com/mahtab2003/xera/dev/app/config/database.php');
-                if ($db_template === false) {
-                    throw new Exception('Could not fetch database configuration template.');
-                }
-
-                $db_content = str_replace(
-                    ['DB_HOSTNAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'],
-                    [$hostname, $username, $password, $database],
-                    $db_template
-                );
-
-                $db_config_path = __DIR__ . '/app/config/database.php';
-                if (file_put_contents($db_config_path, $db_content) === false) {
-                    throw new Exception('Could not write database configuration file.');
-                }
-
-                // Create logs directory and installation log
-                $logs_dir = __DIR__ . '/app/logs';
-                if (!is_dir($logs_dir) && !mkdir($logs_dir, 0755, true)) {
-                    throw new Exception('Could not create logs directory.');
-                }
-
-                $install_log = [
-                    'installed' => true,
-                    'time' => date('d-m-Y h:i:s A'),
-                    'version' => '1.0.0',
-                    'db_version' => '1.0'
-                ];
-
-                $log_path = $logs_dir . '/install.json';
-                if (file_put_contents($log_path, json_encode($install_log)) === false) {
-                    throw new Exception('Could not create installation log.');
-                }
-$files_to_delete = [
-        __DIR__ . '/index.html',      // Temporary redirect file
-        __DIR__ . '/database.sql'     // Database schema file
-    ];
-
-    // Delete temporary files
-    foreach ($files_to_delete as $file) {
-        if (file_exists($file)) {
-            unlink($file);
-        }
-    }
-                $_SESSION['msg'] = json_encode(['success', 'Database configuration completed successfully.']);
-                header('Location: install.php?step=3');
-                exit;
-
-            } catch (Exception $e) {
-                $mysqli->rollback();
-                throw $e;
-            } finally {
-                $mysqli->close();
             }
 
-        } catch (Exception $e) {
-            $_SESSION['msg'] = json_encode(['danger', 'Database Error: ' . $e->getMessage()]);
-            header('Location: install.php?step=2');
+            // Lưu cấu hình database
+            $file = file_get_contents('https://raw.githubusercontent.com/bixacloud/bixa/dev/app/config/database.php');
+            $data = str_replace(
+                ['DB_HOSTNAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'],
+                [$hostname, $username, $password, $database],
+                $file
+            );
+
+            if (!is_dir(__DIR__ . '/app/config')) {
+                mkdir(__DIR__ . '/app/config', 0755, true);
+            }
+            file_put_contents(__DIR__ . '/app/config/database.php', $data);
+
+            // Tạo log file
+            if (!is_dir(__DIR__ . '/app/logs')) {
+                mkdir(__DIR__ . '/app/logs', 0755, true);
+            }
+
+            $json = json_encode([
+                'installed' => true,
+                'time' => date('d-m-Y h:i:s A'),
+                'version' => '1.0.0',
+                'db_version' => '1.0'
+            ]);
+            file_put_contents(__DIR__ . '/app/logs/install.json', $json);
+
+            // Commit transaction
+            $mysqli->commit();
+
+            $_SESSION['msg'] = json_encode(['success', 'Database configured successfully.']);
+            header('location: ' . $base_url . 'install.php?step=3');
             exit;
+
+        } catch (Exception $e) {
+            $mysqli->rollback();
+            throw $e;
+        }
+
+    } catch (Exception $e) {
+        $_SESSION['msg'] = json_encode(['danger', $e->getMessage()]);
+        header('location: ' . $base_url . 'install.php?step=2');
+        exit;
+    } finally {
+        if (isset($mysqli)) {
+            $mysqli->close();
         }
     }
 }
