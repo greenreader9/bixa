@@ -21,3 +21,4 @@ $lang['upgrade_hosting'] = 'Upgrade Hosting';
 $lang['dns_lookup'] = 'DNS Lookup';
 $lang['whois_lookup'] = 'WHOIS Lookup';
 $lang['domain_checker'] = 'Domain Checker';
+$lang['free_accounts'] = 'Free Accounts';
