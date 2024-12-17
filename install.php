@@ -25,30 +25,26 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
     $database = $_POST['database'];
 
     try {
-        // Tạo kết nối
+        
         $mysqli = new mysqli($hostname, $username, $password);
         if ($mysqli->connect_error) {
             throw new Exception("Could not connect to MySQL: " . $mysqli->connect_error);
         }
 
-        // Set charset
         if (!$mysqli->set_charset("utf8mb4")) {
             throw new Exception("Error setting UTF-8 charset: " . $mysqli->error);
         }
 
-        // Tạo database nếu chưa tồn tại
         $sql = "CREATE DATABASE IF NOT EXISTS `" . $mysqli->real_escape_string($database) . "`
                 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
         if (!$mysqli->query($sql)) {
             throw new Exception("Could not create database: " . $mysqli->error);
         }
 
-        // Chọn database
         if (!$mysqli->select_db($database)) {
             throw new Exception("Could not select database: " . $mysqli->error);
         }
 
-        // Đọc file SQL
         $sql_file = __DIR__ . '/database.sql';
         if (!file_exists($sql_file)) {
             throw new Exception("SQL file not found: database.sql");
@@ -59,16 +55,14 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
             throw new Exception("Could not read SQL file");
         }
 
-        // Split SQL thành các statements riêng biệt
         $queries = array();
         $current_query = '';
 
         foreach (explode("\n", $sql_content) as $line) {
             $line = trim($line);
             
-            // Bỏ qua comments và dòng trống
             if (empty($line) || strpos($line, '--') === 0 || strpos($line, '#') === 0) {
-                continue;
+                continue; 
             }
 
             $current_query .= $line . ' ';
@@ -79,11 +73,9 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
             }
         }
 
-        // Bắt đầu transaction
         $mysqli->begin_transaction();
 
         try {
-            // Thực thi từng câu query
             foreach ($queries as $sql) {
                 if (!empty(trim($sql))) {
                     if (!$mysqli->query($sql)) {
@@ -92,11 +84,10 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
                 }
             }
 
-            // Lưu cấu hình database
             $file = file_get_contents('https://raw.githubusercontent.com/bixacloud/bixa/dev/app/config/database.php');
             $data = str_replace(
                 ['DB_HOSTNAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'],
-                [$hostname, $username, $password, $database],
+                [$hostname, $username, $password, $database], 
                 $file
             );
 
@@ -105,7 +96,6 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
             }
             file_put_contents(__DIR__ . '/app/config/database.php', $data);
 
-            // Tạo log file
             if (!is_dir(__DIR__ . '/app/logs')) {
                 mkdir(__DIR__ . '/app/logs', 0755, true);
             }
@@ -118,12 +108,29 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
             ]);
             file_put_contents(__DIR__ . '/app/logs/install.json', $json);
 
-            // Commit transaction
             $mysqli->commit();
 
-            $_SESSION['msg'] = json_encode(['success', 'Database configured successfully.']);
-            header('location: ' . $base_url . 'install.php?step=3');
-            exit;
+            $temp_files = [
+                __DIR__ . '/database.sql',
+                __DIR__ . '/index.html'
+            ];
+
+            foreach ($temp_files as $file) {
+                if (file_exists($file)) {
+                    if (@unlink($file)) {
+                        error_log("Deleted temporary file: " . $file);
+                    } else {
+                        error_log("Failed to delete file: " . $file);
+                    }
+                }
+            }
+
+            if (!isset($_SESSION['install_cleanup'])) {
+                $_SESSION['install_cleanup'] = true;
+                $_SESSION['msg'] = json_encode(['success', 'Database configured successfully.']);
+                header('location: ' . $base_url . 'install.php?step=3');
+                exit;
+            }
 
         } catch (Exception $e) {
             $mysqli->rollback();
@@ -139,8 +146,12 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
             $mysqli->close();
         }
     }
+} elseif (isset($_GET['step']) and $_GET['step'] == 3) {
+    if (isset($_SESSION['install_cleanup'])) {
+        @unlink(__FILE__);
+        unset($_SESSION['install_cleanup']);
+    }
 }
-?>
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
 <head>
