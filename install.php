@@ -152,6 +152,7 @@ if (isset($_GET['step']) and $_GET['step'] == 1 and isset($_POST['submit'])) {
         unset($_SESSION['install_cleanup']);
     }
 }
+?>
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
 <head>
