@@ -25,3 +25,4 @@ $lang['record_content'] = 'Record Content';
 $lang['record_type'] = 'Record Type';
 $lang['ssl_type'] = 'SSL Type';
 $lang['loading'] = 'Loading';
+$lang['account_label'] = 'Account Label';
