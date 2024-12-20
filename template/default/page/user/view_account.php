@@ -12,13 +12,16 @@
                </div>
            </div>
 
-           <?php if($this->session->flashdata('msg')): ?>
-               <?php $msg = json_decode($this->session->flashdata('msg'), true); ?>
-               <div class="alert alert-<?= $msg[0] ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-                   <?= $msg[1] ?>
-                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-               </div>
-           <?php endif; ?>
+           <?php 
+if($this->session->flashdata('msg')): 
+    $msg = json_decode($this->session->flashdata('msg'), true);
+    $this->session->unset_userdata('msg');
+?>
+    <div class="alert alert-<?= $msg[0] ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+        <?= $msg[1] ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
 
            <!-- Pending Alert -->
            <?php if($data['account_status'] === 'pending'): ?>

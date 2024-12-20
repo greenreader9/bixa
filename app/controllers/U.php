@@ -196,156 +196,180 @@ class U extends CI_Controller
 	}
 
 	function login()
-	{
-		if(!$this->user->is_logged())
-		{
-			if($this->input->post('login'))
-			{
-				$this->fv->set_rules('email', $this->base->text('email_address', 'label'), ['trim', 'required', 'valid_email']);
-				$this->fv->set_rules('password', $this->base->text('password', 'label'), ['trim', 'required']);
-				if($this->grc->is_active())
-				{
-					if($this->grc->get_type() == "google")
-					{
-						$this->fv->set_rules('g-recaptcha-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
-					}
-					elseif($this->grc->get_type() == "crypto")
-					{
-						$this->fv->set_rules('CRLT-captcha-token', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
-					}
-					elseif($this->grc->get_type() == "human")
-					{
-						$this->fv->set_rules('h-captcha-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
-					}
-					elseif($this->grc->get_type() == "turnstile")
-					{
-						$this->fv->set_rules('cf-turnstile-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
-					}
-					if($this->fv->run() === true)
-					{
-						$email = $this->input->post('email');
-						$password = $this->input->post('password');
-						$checkbox = $this->input->post('checkbox');
-						if($this->grc->get_type() == "google")
-						{
-							$token = $this->input->post('g-recaptcha-response');
-							$type = "google";
-						}
-						elseif($this->grc->get_type() == "crypto")
-						{
-							$token = $this->input->post('CRLT-captcha-token');
-							$type = "crypto";
-						}
-						elseif($this->grc->get_type() == "turnstile")
-						{
-							$token = $this->input->post('cf-turnstile-response');
-							$type = "turnstile";
-						}
-						else
-						{
-							$token = $this->input->post('h-captcha-response');
-							$type = "human";
-						}
-						if($this->grc->is_valid($token, $type))
-						{
-							if(!$checkbox)
-							{
-								$days = 1;
-							}
-							else
-							{
-								$days = 30;
-							}
-							$res = $this->user->login($email, $password, $days);
-							if(!is_bool($res))
-							{
-								$this->session->set_flashdata('msg', json_encode([0, $this->base->text('oauth_msg', 'error')]));
-								redirect('user');
-							}
-							elseif($res)
-							{
-								$this->session->set_flashdata('msg', json_encode([1, $this->base->text('login_msg', 'success')]));
-								redirect('user');
-							}
-							else
-							{
-								$this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_email_pass', 'error')]));
-								redirect('login');
-							}
-						}
-						else
-						{
-							$this->session->set_flashdata('msg', json_encode([0, $this->base->text('captcha_error', 'error')]));
-							redirect('login');
-						}
-					}
-					else
-					{
-						if(validation_errors() !== '')
-						{
-							$this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-						}
-						else
-						{
-							$this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
-						}
-						redirect('login');
-					}
-				}
-				else
-				{
-					if($this->fv->run() === true)
-					{
-						$email = $this->input->post('email');
-						$password = $this->input->post('password');
-						$checkbox = $this->input->post('checkbox');
-						if(!$checkbox)
-						{
-							$days = 1;
-						}
-						else
-						{
-							$days = 30;
-						}
-						$res = $this->user->login($email, $password, $days);
-						if($res)
-						{
-							$this->session->set_flashdata('msg', json_encode([1, $this->base->text('login_msg', 'success')]));
-							redirect('user');
-						}
-						else
-						{
-							$this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_email_pass', 'error')]));
-							redirect('login');
-						}
-					}
-					else
-					{
-						if(validation_errors() !== '')
-						{
-							$this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
-						}
-						else
-						{
-							$this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
-						}
-						redirect('login');
-					}
-				}
-			}
-			else
-			{
-				$data['title'] = 'login';
-				$this->load->view($this->base->get_template().'/form/includes/user/header.php', $data);
-				$this->load->view($this->base->get_template().'/form/user/login.php');
-				$this->load->view($this->base->get_template().'/form/includes/user/footer.php');
-			}
-		}
-		else
-		{
-			redirect('user');
-		}
-	}
+{
+   // Kiểm tra chưa đăng nhập
+   if(!$this->user->is_logged())
+   {
+       // Xử lý form submit
+       if($this->input->post('login'))
+       {
+           // Set validation rules
+           $this->fv->set_rules('email', $this->base->text('email_address', 'label'), ['trim', 'required', 'valid_email']);
+           $this->fv->set_rules('password', $this->base->text('password', 'label'), ['trim', 'required']);
+           
+           // Nếu có captcha
+           if($this->grc->is_active())
+           {
+               // Kiểm tra loại captcha và thêm rule tương ứng
+               if($this->grc->get_type() == "google")
+               {
+                   $this->fv->set_rules('g-recaptcha-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
+               }
+               elseif($this->grc->get_type() == "crypto") 
+               {
+                   $this->fv->set_rules('CRLT-captcha-token', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
+               }
+               elseif($this->grc->get_type() == "human")
+               {
+                   $this->fv->set_rules('h-captcha-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
+               }
+               elseif($this->grc->get_type() == "turnstile")
+               {
+                   $this->fv->set_rules('cf-turnstile-response', $this->base->text('recaptcha', 'label'), ['trim', 'required']);
+               }
+
+               // Kiểm tra validation
+               if($this->fv->run() === true)
+               {
+                   $email = $this->input->post('email');
+                   $password = $this->input->post('password'); 
+                   $checkbox = $this->input->post('checkbox');
+
+                   // Lấy token captcha theo loại
+                   if($this->grc->get_type() == "google")
+                   {
+                       $token = $this->input->post('g-recaptcha-response');
+                       $type = "google";
+                   }
+                   elseif($this->grc->get_type() == "crypto")
+                   {
+                       $token = $this->input->post('CRLT-captcha-token');
+                       $type = "crypto";
+                   }
+                   elseif($this->grc->get_type() == "turnstile")
+                   {
+                       $token = $this->input->post('cf-turnstile-response');
+                       $type = "turnstile";
+                   }
+                   else
+                   {
+                       $token = $this->input->post('h-captcha-response');
+                       $type = "human";
+                   }
+
+                   // Validate captcha
+                   if($this->grc->is_valid($token, $type))
+                   {
+                       // Set cookie duration
+                       $days = !$checkbox ? 1 : 30;
+
+                       // Login
+                       $res = $this->user->login($email, $password, $days);
+
+                       if(!is_bool($res))
+                       {
+                           $this->session->unset_userdata('msg');
+                           $this->session->set_flashdata('msg', json_encode([0, $this->base->text('oauth_msg', 'error')]));
+                           redirect('user');
+                           return;
+                       }
+                       elseif($res)
+                       {
+                           $this->session->unset_userdata('msg');
+                           $this->session->set_flashdata('msg', json_encode([1, $this->base->text('login_msg', 'success')]));
+                           redirect('user');
+                           return;
+                       }
+                       else
+                       {
+                           $this->session->unset_userdata('msg');
+                           $this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_email_pass', 'error')]));
+                           redirect('login');
+                           return;
+                       }
+                   }
+                   else
+                   {
+                       $this->session->unset_userdata('msg');
+                       $this->session->set_flashdata('msg', json_encode([0, $this->base->text('captcha_error', 'error')]));
+                       redirect('login');
+                       return;
+                   }
+               }
+               else
+               {
+                   // Validation errors
+                   $this->session->unset_userdata('msg');
+                   if(validation_errors() !== '')
+                   {
+                       $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+                   }
+                   else
+                   {
+                       $this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
+                   }
+                   redirect('login');
+                   return;
+               }
+           }
+           // Không có captcha
+           else
+           {
+               if($this->fv->run() === true)
+               {
+                   $email = $this->input->post('email');
+                   $password = $this->input->post('password');
+                   $checkbox = $this->input->post('checkbox');
+                   $days = !$checkbox ? 1 : 30;
+
+                   $res = $this->user->login($email, $password, $days);
+                   if($res)
+                   {
+                       $this->session->unset_userdata('msg');
+                       $this->session->set_flashdata('msg', json_encode([1, $this->base->text('login_msg', 'success')]));
+                       redirect('user');
+                       return;
+                   }
+                   else
+                   {
+                       $this->session->unset_userdata('msg');
+                       $this->session->set_flashdata('msg', json_encode([0, $this->base->text('invalid_email_pass', 'error')]));
+                       redirect('login');
+                       return;
+                   }
+               }
+               else
+               {
+                   $this->session->unset_userdata('msg');
+                   if(validation_errors() !== '')
+                   {
+                       $this->session->set_flashdata('msg', json_encode([0, validation_errors()]));
+                   }
+                   else
+                   {
+                       $this->session->set_flashdata('msg', json_encode([0, $this->base->text('required_fields', 'error')]));
+                   }
+                   redirect('login');
+                   return;
+               }
+           }
+       }
+       // Load view if not POST
+       else
+       {
+           $data['title'] = 'login';
+           $this->session->unset_userdata('msg');
+           $this->load->view($this->base->get_template().'/form/includes/user/header.php', $data);
+           $this->load->view($this->base->get_template().'/form/user/login.php');
+           $this->load->view($this->base->get_template().'/form/includes/user/footer.php');
+       }
+   }
+   // Redirect if already logged in
+   else
+   {
+       redirect('user');
+   }
+}
 
 	function forget()
 	{
