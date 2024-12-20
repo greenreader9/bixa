@@ -24,3 +24,4 @@ $lang['record_name'] = 'Record Name';
 $lang['record_content'] = 'Record Content';
 $lang['record_type'] = 'Record Type';
 $lang['ssl_type'] = 'SSL Type';
+$lang['loading'] = 'Loading';

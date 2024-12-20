@@ -36,3 +36,5 @@ $lang['last_reply'] = 'Last reply';
 $lang['type'] = 'Type';
 $lang['provider'] = 'Provider';
 $lang['ready'] = 'Ready';
+$lang['inodes'] = 'Inodes';
+$lang['server_ip'] = 'Server IP';

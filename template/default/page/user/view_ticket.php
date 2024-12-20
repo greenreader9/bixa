@@ -86,7 +86,7 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-xs me-2">
-                                    <img src="<?= base_url() ?>assets/<?= $this->base->get_template() ?>/images/user.png" 
+                                    <img src="<?= base_url() ?>assets/<?= $this->base->get_template() ?>/img/user.png" 
                                          class="rounded-circle img-fluid" alt="user">
                                 </div>
                                 <span><?= $this->user->get_name() ?></span>

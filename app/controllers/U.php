@@ -13,6 +13,7 @@ class U extends CI_Controller
 		$this->load->model(['acme' => 'acme']);
 		$this->load->model('mofh');
 		$this->load->model('oauth');
+		$this->load->model('vistapanel');
 		$this->load->model(['sitepro' => 'sp']);
 		$this->load->library(['form_validation' => 'fv']);
 		$this->load->model(['recaptcha' => 'grc']);
@@ -555,23 +556,43 @@ class U extends CI_Controller
 	}
 
 	function dashboard()
-	{
-		if($this->user->is_logged())
-		{
-			$data['title'] = 'dashboard';
-			$data['active'] = 'home';
-			$data['list'] = $this->account->get_user_accounts();
-			
-			$this->load->view($this->base->get_template().'/page/includes/user/header', $data);
-			$this->load->view($this->base->get_template().'/page/includes/user/navbar');
-			$this->load->view($this->base->get_template().'/page/user/accounts');
-			$this->load->view($this->base->get_template().'/page/includes/user/footer');
-		}
-		else
-		{
-			redirect('login');
-		}
-	}
+{
+    if($this->user->is_logged())
+    {
+        $data['title'] = 'dashboard';
+        $data['active'] = 'home';
+        
+        // Get counts for dashboard cards
+        $data['account_count'] = count($this->account->get_user_accounts());
+        $data['ssl_count'] = count($this->acme->get_ssl_list());
+        $data['ticket_count'] = count($this->ticket->get_user_tickets()); 
+        
+        // Get latest 5 accounts for account list
+        $data['accounts'] = array_slice($this->account->get_user_accounts(), 0, 5);
+
+        // Get announcements - you may want to create an announcements model/table
+        $data['announcements'] = [
+            [
+                'message' => 'Now you can create web hosting accounts with in a few steps.'
+            ],
+            [
+                'message' => 'Now you can create Self Signed SSL and GoGetSSL in a few clicks.'
+            ],
+            [
+                'message' => 'Now it is easy to contact with our support staff through Support Center.'
+            ]
+        ];
+
+        $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
+        $this->load->view($this->base->get_template().'/page/includes/user/navbar'); 
+        $this->load->view($this->base->get_template().'/page/user/dashboard');
+        $this->load->view($this->base->get_template().'/page/includes/user/footer');
+    }
+    else
+    {
+        redirect('login');
+    }
+}
 
 	function tickets()
 	{
@@ -1103,6 +1124,95 @@ function create_account()
    $this->load->view($this->base->get_template().'/page/includes/user/footer');
 }
 
+
+
+function get_account_stats($id = null)
+{
+    ob_start();
+    ob_clean();
+    
+    try {
+        // Validate input 
+        if(!$id) {
+            throw new Exception('Account ID is required');
+        }
+
+        if(!$this->user->is_logged()) {
+            throw new Exception('Not logged in');
+        }
+
+        // Get account info
+        $account = $this->account->get_user_account($id);
+        if(!$account) {
+            throw new Exception('Account not found');
+        }
+
+        if($account['account_status'] !== 'active') {
+            throw new Exception('Account is not active');
+        }
+
+        // Lấy thống kê thật từ API vistapanel
+        require_once APPPATH . 'vendor/vistapanel/api-client.php';
+        $api = new VistapanelApi();
+        $api->setCpanelUrl("https://cpanel.byethost.com");
+
+        if($api->login($account['account_username'], $account['account_password'])) {
+            $stats = $api->getUserStats();
+            
+            // Format lại dữ liệu cho phù hợp
+            $formattedStats = [
+                'disk' => [
+                    'used' => (float)str_replace(['MB', 'GB'], '', $stats['Disk Space Used:']),
+                    'total' => (float)str_replace(['MB', 'GB'], '', $stats['Disk Quota:']),
+                    'unit' => 'MB',
+                    'percent' => 0 
+                ],
+                'bandwidth' => [
+                    'used' => (float)str_replace(['MB', 'GB'], '', $stats['Bandwidth used:']),
+                    'total' => 'Unlimited',
+                    'unit' => 'MB',
+                    'percent' => 0
+                ],
+                'inodes' => [
+                    'used' => (int)$stats['Inodes Used:'],
+                    'total' => 59400, // Maximum inodes allowed
+                    'percent' => 0
+                ]
+            ];
+
+            // Tính phần trăm
+            if($formattedStats['disk']['total'] > 0) {
+                $formattedStats['disk']['percent'] = 
+                    ($formattedStats['disk']['used'] / $formattedStats['disk']['total']) * 100;
+            }
+
+            if($formattedStats['inodes']['total'] > 0) {
+                $formattedStats['inodes']['percent'] = 
+                    ($formattedStats['inodes']['used'] / $formattedStats['inodes']['total']) * 100;
+            }
+
+            $api->logout();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'data' => $formattedStats
+            ]);
+            exit;
+        } else {
+            throw new Exception('Failed to connect to server');
+        }
+
+    } catch(Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+        exit;
+    }
+}
+
 function view_account($id, $action = null, $path = null)
 {
     if($this->user->is_logged())
@@ -1126,22 +1236,31 @@ function view_account($id, $action = null, $path = null)
             return;
         }
 
-        // Handle softaculous login
         if($action === 'softaculous') {
-            $res = $this->account->get_user_account($id);
-            if($res !== false && $res['account_status'] === 'active')
-            {
-                $data['username'] = $res['account_username'];
-                $data['password'] = $res['account_password'];
-                $this->load->view($this->base->get_template().'/page/user/softaculous_login', $data);
-            }
-            else
-            {
-                $this->session->set_flashdata('msg', json_encode([0, $this->base->text('error_occured', 'error')]));
-                redirect("account/view/$id");
-            }
-            return;
+    $res = $this->account->get_user_account($id);
+    if($res !== false && $res['account_status'] === 'active')
+    {
+        $softaculous_url = $this->mofh->get_softaculous_link(
+            $res['account_username'],
+            $res['account_password']
+        );
+
+        if($softaculous_url) {
+            redirect($softaculous_url);
+        } else {
+            // Fallback to form login if direct link fails
+            $data['username'] = $res['account_username'];
+            $data['password'] = $res['account_password'];
+            $this->load->view($this->base->get_template().'/page/user/softaculous_login', $data);
         }
+    }
+    else
+    {
+        $this->session->set_flashdata('msg', json_encode([0, $this->base->text('error_occured', 'error')]));
+        redirect("account/view/$id");
+    }
+    return;
+}
 
         // Handle file manager login
         if($action === 'filemanager') {
@@ -1161,7 +1280,7 @@ function view_account($id, $action = null, $path = null)
             return;
         }
 
-        // Handle account reactivation
+        // Handle reactivation request
         if($this->input->get('reactivate'))
         {
             $count = $this->account->get_active_accounts($this->user->get_key());
@@ -1213,6 +1332,15 @@ function view_account($id, $action = null, $path = null)
         $data['active'] = 'account';
         $data['id'] = $id;
         $data['data'] = $this->account->get_user_account($id);
+        if($data['data'] !== false && $data['data']['account_status'] === 'active') {
+            try {
+                $domain = $data['data']['account_domain'];
+                $ip = gethostbyname($domain);
+                $data['server_ip'] = ($ip !== $domain) ? $ip : false;
+            } catch(Exception $e) {
+                $data['server_ip'] = false;
+            }
+        }
         if($data['data'] !== false)
         {
             $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
@@ -1732,7 +1860,10 @@ function view_account($id, $action = null, $path = null)
 	{
 		if($this->user->is_logged())
 		{
-$this->load->view($this->base->get_template().'/page/includes/user/header', $data);						$this->load->view($this->base->get_template().'/page/includes/user/navbar');			$this->load->view($this->base->get_template().'/page/user/upgrade');									$this->load->view($this->base->get_template().'/page/includes/user/footer');
+$this->load->view($this->base->get_template().'/page/includes/user/header', $data);						
+$this->load->view($this->base->get_template().'/page/includes/user/navbar');			
+$this->load->view($this->base->get_template().'/page/user/upgrade');									
+$this->load->view($this->base->get_template().'/page/includes/user/footer');
 		}
 		else
 		{
@@ -1823,5 +1954,60 @@ $this->load->view($this->base->get_template().'/page/includes/user/header', $dat
 			redirect('login');
 		}
 	}
+	
+	// Thêm các function mới
+function html_tools()
+{
+    if($this->user->is_logged())
+    {
+        $data['title'] = 'HTML Tools';
+        $data['active'] = 'tools';
+
+        $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
+        $this->load->view($this->base->get_template().'/page/includes/user/navbar');
+        $this->load->view($this->base->get_template().'/page/user/html_tools');
+        $this->load->view($this->base->get_template().'/page/includes/user/footer');
+    }
+    else
+    {
+        redirect('login');
+    }
+}
+
+function base64_tools()
+{
+    if($this->user->is_logged())
+    {
+        $data['title'] = 'Base64 Tools';
+        $data['active'] = 'tools';
+
+        $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
+        $this->load->view($this->base->get_template().'/page/includes/user/navbar');
+        $this->load->view($this->base->get_template().'/page/user/base64_tools');
+        $this->load->view($this->base->get_template().'/page/includes/user/footer');
+    }
+    else
+    {
+        redirect('login');
+    }
+}
+function wordpress_tools()
+{
+    if($this->user->is_logged())
+    {
+        $data['title'] = 'WordPress Tools';
+        $data['active'] = 'tools';
+
+        $this->load->view($this->base->get_template().'/page/includes/user/header', $data);
+        $this->load->view($this->base->get_template().'/page/includes/user/navbar');
+        $this->load->view($this->base->get_template().'/page/user/wordpress_tools');
+        $this->load->view($this->base->get_template().'/page/includes/user/footer');
+    }
+    else
+    {
+        redirect('login');
+    }
+}
+	
 }
 

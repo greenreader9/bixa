@@ -1,12 +1,13 @@
 <?php
 $lang['social_login'] = '- Or sign in with -';
-$lang['company'] = 'BIXA';
+$lang['company'] = 'FHOST';
 $lang['made'] = 'Crafted with <i class="mdi mdi-heart text-danger"></i> by';
 $lang['redirect_content'] = 'Please wait while we redirect you...';
 $lang['nothing_to_show'] = 'Nothing to show.';
 $lang['premium_content'] = 'Upgrade your plan to access premium features and benefits.';
 $lang['account_warning'] = 'Please remove all domains and subdomains before deactivating your account otherwise all domains and subdomains on this account will be locked forever.';
 $lang['cpanel_login'] = 'We\'re now going to redirect you to cPanel.';
+$lang['filemanager_login'] = 'We\'re now going to redirect you to Filemanager.';
 $lang['account_created'] = 'Everything has been setup correctly.';
 $lang['search_note'] = 'The search result will be displayed here once a domain name is searched.';
 $lang['search_error'] = 'Sorry! this domain name is not assosiated with any of our web hosting accounts.';
