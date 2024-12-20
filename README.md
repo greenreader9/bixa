@@ -23,14 +23,14 @@ Bixa is a hosting account and support management system especially designed to w
 - Theme Management
 - Support Management
 - Administrative Access
-- Integration With:
+- Integrates With:
 	- MOFH (MyOwnFreeHost)
 	- Google reCAPTCHA 
 	- hCaptcha
 	- Cloudflare Turnstile
 	- GoGetSSL
 	- ACMEv2 (Let's Encrypt, ZeroSSL and Google Trust)
-	- SitePro
+	- Site.Pro
 	- SMTP
 - Update Manager
 - Multi-lingual
@@ -45,8 +45,8 @@ Your server needs to meet the following minimum requirements to run Bixa:
 
 ### 💾 Installation 
 The installation of Bixa is much easier than you think!
-- Download the Bixa installation files [here](https://github.com/bixacloud/bixa/releases/latest). Alternatively, if you want the latest development version you can get it [here](https://github.com/bixacloud/bixa/archive/refs/heads/dev.zip).
-- Extract the file and upload the contents to your web hosting account. 
+- Download the Bixa installation files [here](https://github.com/bixacloud/bixa/releases/latest). Alternatively, get the latest development version [here](https://github.com/bixacloud/bixa/archive/refs/heads/dev.zip).
+- Extract the ZIP file and upload the contents to your web hosting account. 
 - Create a new database for Bixa.
 - Go to ```https://{your.domain}/{bixa-directory}/install.php``` and click on the 'Get Started' button.
 - Set your website's ```Website URL```, ```Cookie Prefix```, enable ```CSRF Protection``` and hit the 'Next Step' button.
@@ -54,29 +54,28 @@ The installation of Bixa is much easier than you think!
 - Register an admin account and log in to your admin panel. 
 - Replace the logo and favicon located in ```assets/default/img/``` with your own.
 - Setup SMTP (see below for some services you can use).
-- Refer to [Setup Guide](Setup-Guide.md)
 
 
 ### 📧 SMTP
-Here are some widely used SMTP services. They have free plans with some limitations, most importantly though, they are compatible with Bixa.
+Here are some widely used SMTP services. They all have free plans with some limitations, and are compatible with Bixa.
 
-#### Testing Environment
-- [Mailtrap](https://mailtrap.io/)
-  - Email Testing Environment (500 emails/month)
-  - Real SMTP Service (1,000 emails/month)
-  - Perfect for both development and production
-  - Includes email testing and debugging features
 
 #### Production Environment
-- [Mailgun](https://www.mailgun.com/). 
-> **Note**  
-> Mailgun seems to offer only a trial plan for a month, and without adding a credit card you are only authorized to send emails to 5 recipients. Therefore, you may want to choose another service.
-- [Mailjet](https://mailjet.com/).
-- [SendGrid](https://sendgrid.com/free/).
+Information shown below was last updated in December 2024 and may not be accurate. 
+
+- [Mailtrap](https://mailtrap.io/):
+  - Email Testing Environment (500 emails/month free)
+  - Production SMTP Service (1,000 emails/month free)
+  - Good for both development and production
+  - Includes email testing and debugging features
+- [Mailjet](https://mailjet.com/):
+  - Production SMTP Service (6,000 emails/month free)
+- [SendGrid](https://sendgrid.com/free/):
+  - Production SMTP Service (1000 emails/day free)
 
 
 ### 🤔 Help
-You can [open an issue here](https://github.com/bixacloud/bixa/issues/new) if you have discovered a bug or have an issue. In any way, please ensure your topic has not been previously discussed, and if it has contribute to that discussion instead of making a new one when you can.
+You can [open an issue here](https://github.com/bixacloud/bixa/issues/new) if you have discovered a bug or have an issue. Please ensure your topic has not been previously discussed, if it has, please contribute to that discussion instead of creating a new one if possible.
 
 ### 👍 Like Bixa?
 If you like project Bixa please donate [here](https://bixa.app/DONATE.md).
