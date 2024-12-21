@@ -129,13 +129,16 @@
                     </a>
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
-                        <i data-feather="globe"></i>
-                        <span data-key="t-domain"><?= $this->base->text('domain_tools', 'heading') ?></span>
+                        <i data-feather="tool"></i>
+                        <span data-key="t-domain"><?= $this->base->text('tools', 'title') ?></span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="<?= base_url() ?>domain/checker" data-key="t-domain-checker"><?= $this->base->text('domain_checker', 'title') ?></a></li>
                         <li><a href="<?= base_url() ?>whois/lookup" data-key="t-whois-lookup"><?= $this->base->text('whois_lookup', 'title') ?></a></li>
-                        <li><a href="<?= base_url() ?>u/dns_lookup" data-key="t-dns-lookup"><?= $this->base->text('dns_lookup', 'title') ?></a></li>
+                        <li><a href="<?= base_url() ?>dns/lookup" data-key="t-dns-lookup"><?= $this->base->text('dns_lookup', 'title') ?></a></li>
+                        <li><a href="<?= base_url() ?>tools/html" data-key="t-dns-lookup"><?= $this->base->text('html_css', 'title') ?></a></li>
+                        <li><a href="<?= base_url() ?>tools/base64" data-key="t-dns-lookup"><?= $this->base->text('base64', 'title') ?></a></li>
+                        <li><a href="<?= base_url() ?>tools/wordpress" data-key="t-dns-lookup"><?= $this->base->text('wp', 'title') ?></a></li>
                     </ul>
                 </li>
             </ul>
