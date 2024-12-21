@@ -13,12 +13,13 @@
             "email": "hi@bixa.app"
         }
     ],
-    "scripts": {
+   "scripts": {
         "post-create-project-cmd": [
-            "@php -r \"echo '\\n\\033[32mInstallation completed!\\033[0m\\n';\"",
-            "@php -r \"echo 'Please follow these steps to complete installation:\\n';\"",
-            "@php -r \"echo '1. Configure your web server to point to the project directory\\n';\"",
-            "@php -r \"echo '2. Visit http://your-domain/install.php to run installation wizard\\n\\n';\""
+            "echo 'Installation completed!'",
+            "echo 'Please follow these steps to complete installation:'",
+            "echo '1. Configure your web server to point to the project directory'",
+            "echo '2. Visit http://your-domain/install.php to run installation wizard'",
+            "echo ''"
         ]
     },
     "config": {
