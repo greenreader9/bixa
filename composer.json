@@ -23,5 +23,8 @@
     },
     "config": {
         "vendor-dir": "vendor"
-    }
+   },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "default-branch": true
 }
