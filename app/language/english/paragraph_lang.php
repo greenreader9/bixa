@@ -1,6 +1,6 @@
 <?php
 $lang['social_login'] = '- Or sign in with -';
-$lang['company'] = 'FHOST';
+$lang['company'] = 'BIXA';
 $lang['made'] = 'Crafted with <i class="mdi mdi-heart text-danger"></i> by';
 $lang['redirect_content'] = 'Please wait while we redirect you...';
 $lang['nothing_to_show'] = 'Nothing to show.';
