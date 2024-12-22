@@ -4,24 +4,25 @@
             <!-- Row -->
             <div class="row">
                 <div class="col-12">
-                    <!-- Card Add Domain -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Add Extension</h4>
-                        </div>
-                        <div class="card-body">
-                            <form action="" method="post">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <input type="text" name="domain" class="form-control" placeholder="Domain name...">
-                                    </div>
-                                    <div class="col-auto">
-                                        <button type="submit" name="add_domain" class="btn btn-primary">Add</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                  <!-- Card Add Domain -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h4 class="card-title mb-0">Add Extension</h4>
+    </div>
+    <div class="card-body">
+        <form action="<?= base_url('domain/list') ?>" method="GET">
+            <div class="row align-items-center">
+                <div class="col">
+                    <input type="text" name="domain" class="form-control" placeholder="Domain name...">
+                </div>
+                <div class="col-auto">
+                    <input type="hidden" name="add_domain" value="true">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
                     <!-- Card Domain List -->
                     <div class="card">
