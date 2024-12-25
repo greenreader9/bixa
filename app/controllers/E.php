@@ -133,7 +133,7 @@ function verify()
                 );
                 $data['mailbox_link'] = isset($providers[$domain]) ? $providers[$domain] : 'https://google.com';
                 
-                $this->load->view($this->base->get_template() . '/errors/custom/error_400', $data);
+                $this->load->view($this->base->get_template() . '/errors/custom/verify', $data);
             }
         } else {
             redirect('user'); 
