@@ -127,11 +127,33 @@
                         <i data-feather="book"></i>
                         <span data-key="t-support"><?= $this->base->text('community_forum', 'heading') ?></span>
                     </a>
+					</li>
+					<?php if($this->user->has_cloudflare_api()): ?>
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow">
+                        <i data-feather="cloud"></i>
+                        <span data-key="t-cloudflare">Cloudflare DNS</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="<?= base_url('cloudflare/settings') ?>" data-key="t-cf-settings">API Settings</a></li>
+                        <li><a href="<?= base_url('cloudflare/zones') ?>" data-key="t-cf-zones">Manage Zones</a></li>
+                    </ul>
+                </li>
+                <?php else: ?>
+                <li>
+                    <a href="<?= base_url('cloudflare/settings') ?>">
+                        <i data-feather="cloud"></i>
+                        <span data-key="t-cloudflare">Cloudflare Setup</span>
+                    </a>
+                </li>
+                <?php endif; ?>
+
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="tool"></i>
                         <span data-key="t-domain"><?= $this->base->text('tools', 'title') ?></span>
                     </a>
+             
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="<?= base_url() ?>domain/checker" data-key="t-domain-checker"><?= $this->base->text('domain_checker', 'title') ?></a></li>
                         <li><a href="<?= base_url() ?>whois/lookup" data-key="t-whois-lookup"><?= $this->base->text('whois_lookup', 'title') ?></a></li>

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => '1.1.x-dev',
-        'version' => '1.1.9999999.9999999-dev',
-        'reference' => 'c687c5c71688e308b4d46df0cacaa5dc3dd7994f',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '6c44520cd5d3aed08c7f82ed2658a0a5266fac2a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.1.x-dev',
-            'version' => '1.1.9999999.9999999-dev',
-            'reference' => 'c687c5c71688e308b4d46df0cacaa5dc3dd7994f',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '6c44520cd5d3aed08c7f82ed2658a0a5266fac2a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -25,6 +25,15 @@
             'reference' => 'c78ad953d3680acf3f02024c93ff32724d353590',
             'type' => 'library',
             'install_path' => __DIR__ . '/../acmephp/ssl',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'cloudflare/sdk' => array(
+            'pretty_version' => '1.4.0',
+            'version' => '1.4.0.0',
+            'reference' => '2d3f198773e865b5de2357d7bdbc52bdf42e8f97',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../cloudflare/sdk',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

@@ -116,3 +116,6 @@ $route['u/get_account_stats/(:any)'] = 'u/get_account_stats/$1';
 $route['tools/html'] = 'u/html_tools';
 $route['tools/base64'] = 'u/base64_tools';
 $route['tools/wordpress'] = 'u/wordpress_tools';
+$route['cloudflare/settings'] = 'u/cloudflare_settings';
+$route['cloudflare/zones'] = 'u/cloudflare_zones';
+$route['manage_dns/(:any)'] = 'u/manage_dns/$1';

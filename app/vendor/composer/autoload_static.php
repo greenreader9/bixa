@@ -45,6 +45,10 @@ class ComposerStaticInited609bd98e3b5c3e3d3186f232403dea
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
+        'C' => 
+        array (
+            'Cloudflare\\API\\' => 15,
+        ),
         'A' => 
         array (
             'AcmePhp\\Ssl\\' => 12,
@@ -108,6 +112,10 @@ class ComposerStaticInited609bd98e3b5c3e3d3186f232403dea
         'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'Cloudflare\\API\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cloudflare/sdk/src',
         ),
         'AcmePhp\\Ssl\\' => 
         array (

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 16, 2024 at 11:34 AM
+-- Generation Time: Dec 25, 2024 at 06:04 PM
 -- Server version: 11.7.1-MariaDB-log
 -- PHP Version: 8.1.10
 
@@ -338,6 +338,8 @@ CREATE TABLE `is_user` (
   `user_id` int(11) NOT NULL,
   `user_name` varchar(100) DEFAULT NULL,
   `user_email` varchar(100) NOT NULL,
+  `user_cf_email` varchar(255) DEFAULT NULL,
+  `user_cf_key` text DEFAULT NULL,
   `user_password` varchar(100) NOT NULL,
   `user_key` varchar(16) NOT NULL,
   `user_rec` varchar(32) NOT NULL,
