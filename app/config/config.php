@@ -544,3 +544,25 @@ $config['proxy_ips'] = '';
 | - Never commit the actual key to version control
 */
 $config['encryption_key'] = '';
+/*
+|--------------------------------------------------------------------------
+| Encryption Key
+|--------------------------------------------------------------------------
+| 
+| This key is used by the CodeIgniter encryption library for encryption and 
+| decryption operations, including Cloudflare DNS API key storage. You MUST
+| set this to a secure random string (32-64 characters recommended) and keep 
+| it confidential.
+|
+| Examples of secure keys:
+| - Random string: 'dK8#mP9$vL2*nR5@jX7&qY4'
+| - Hash value: sha1(microtime())
+| - Combination: base64_encode(random_bytes(32))
+|
+| IMPORTANT: 
+| - Once set, DO NOT change this key if you have encrypted data
+| - Changing the key will make existing encrypted data unrecoverable
+| - Use a strong unique key for each environment (dev/staging/prod)
+| - Never commit the actual key to version control
+*/
+$config['encryption_key'] = '';
