@@ -17,7 +17,9 @@ class U extends CI_Controller
 		$this->load->model(['sitepro' => 'sp']);
 		$this->load->library(['form_validation' => 'fv']);
 		$this->load->model(['recaptcha' => 'grc']);
-		$this->load->model('cloudflare'); 
+		$this->load->model('cloudflare');
+        $this->load->model('ads');
+        $this->load->helper('ads');
 		if(!$this->base->is_active())
 		{
 			redirect('500');

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 28, 2024 at 05:31 PM
+-- Generation Time: Dec 29, 2024 at 05:27 PM
 -- Server version: 11.7.1-MariaDB-log
 -- PHP Version: 8.1.10
 
@@ -93,6 +93,21 @@ CREATE TABLE `is_admin` (
   `admin_rec` varchar(32) NOT NULL,
   `admin_status` varchar(8) NOT NULL,
   `admin_date` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `is_ads`
+--
+
+CREATE TABLE `is_ads` (
+  `ad_id` int(11) NOT NULL,
+  `ad_name` varchar(255) NOT NULL,
+  `ad_content` text NOT NULL,
+  `ad_placement` varchar(50) NOT NULL,
+  `ad_status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `ad_created` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -393,6 +408,14 @@ ALTER TABLE `is_admin`
   ADD PRIMARY KEY (`admin_id`);
 
 --
+-- Indexes for table `is_ads`
+--
+ALTER TABLE `is_ads`
+  ADD PRIMARY KEY (`ad_id`),
+  ADD KEY `ad_placement` (`ad_placement`),
+  ADD KEY `ad_status` (`ad_status`);
+
+--
 -- Indexes for table `is_domain`
 --
 ALTER TABLE `is_domain`
@@ -443,6 +466,12 @@ ALTER TABLE `is_account`
 --
 ALTER TABLE `is_admin`
   MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `is_ads`
+--
+ALTER TABLE `is_ads`
+  MODIFY `ad_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `is_domain`

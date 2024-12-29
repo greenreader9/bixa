@@ -67,95 +67,115 @@
     <div class="vertical-menu">
         <div data-simplebar class="h-100">
             <div id="sidebar-menu">
-    <ul class="metismenu list-unstyled" id="side-menu">
-        <li class="menu-title" data-key="t-menu"></li>
+                <ul class="metismenu list-unstyled" id="side-menu">
+                    <li class="menu-title">Menu</li>
 
-        <li class="<?php if (isset($active) and $active == 'home') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>admin/">
-                <i data-feather="home"></i>
-                <span data-key="t-dashboard">Dashboard</span>
-            </a>
-        </li>
+                    <!-- Dashboard -->
+                    <li class="<?php if (isset($active) && $active == 'home') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/">
+                            <i data-feather="home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'client') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>client/list">
-                <i data-feather="users"></i>
-                <span data-key="t-clients">My Clients</span>
-            </a>
-        </li>
+                    <!-- Clients -->
+                    <li class="<?php if (isset($active) && $active == 'client') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>client/list">
+                            <i data-feather="users"></i>
+                            <span>My Clients</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'account') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>admin/account/list">
-                <i data-feather="server"></i>
-                <span data-key="t-accounts">MOFH Accounts</span>
-            </a>
-        </li>
+                    <!-- MOFH Accounts -->
+                    <li class="<?php if (isset($active) && $active == 'account') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/account/list">
+                            <i data-feather="server"></i>
+                            <span>MOFH Accounts</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'ticket') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>admin/ticket/list">
-                <i data-feather="message-square"></i>
-                <span data-key="t-tickets">Support Tickets</span>
-            </a>
-        </li>
+                    <!-- Support Tickets -->
+                    <li class="<?php if (isset($active) && $active == 'ticket') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/ticket/list">
+                            <i data-feather="message-square"></i>
+                            <span>Support Tickets</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'site_settings') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>admin/site">
-                <i data-feather="settings"></i>
-                <span data-key="t-site-settings">Site Settings</span>
-            </a>
-        </li>
+                    <li class="menu-title">Content Management</li>
 
-        <li class="<?php if (isset($active) and $active == 'api_settings') : ?>mm-active<?php endif ?>">
-            <a href="javascript: void(0);" class="has-arrow">
-                <i data-feather="code"></i>
-                <span data-key="t-api-settings">API Settings</span>
-            </a>
-            <ul class="sub-menu" aria-expanded="false">
-                <li><a href="<?= base_url() ?>api/settings/mofh">MOFH Settings</a></li>
-                <li><a href="<?= base_url() ?>api/settings/sitepro">SitePro Settings</a></li>
-            </ul>
-        </li>
+                    <!-- HTML Content -->
+                    <li class="<?php if (isset($active) && $active == 'html') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/html">
+                            <i data-feather="code"></i>
+                            <span>HTML Content</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'email_settings') : ?>mm-active<?php endif ?>">
-            <a href="javascript: void(0);" class="has-arrow">
-                <i data-feather="mail"></i>
-                <span data-key="t-email-settings">Email Settings</span>
-            </a>
-            <ul class="sub-menu" aria-expanded="false">
-                <li><a href="<?= base_url() ?>api/settings/smtp">SMTP Settings</a></li>
-                <li><a href="<?= base_url() ?>email/templates">Email Templates</a></li>
-            </ul>
-        </li>
+                    <!-- Ads Management -->
+                    <li class="<?php if (isset($active) && $active == 'ads') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/ads">
+                            <i data-feather="dollar-sign"></i>
+                            <span>Manage Ads</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'ssl_settings') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>api/settings/ssl">
-                <i data-feather="shield"></i>
-                <span data-key="t-ssl-settings">SSL Settings</span>
-            </a>
-        </li>
+                    <li class="menu-title">Settings</li>
 
-        <li class="<?php if (isset($active) and $active == 'captcha_settings') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>api/settings/captcha">
-                <i data-feather="check-square"></i>
-                <span data-key="t-captcha-settings">Captcha Settings</span>
-            </a>
-        </li>
+                    <!-- Site Settings -->
+                    <li class="<?php if (isset($active) && $active == 'site_settings') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>admin/site">
+                            <i data-feather="settings"></i>
+                            <span>Site Settings</span>
+                        </a>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'oauth_settings') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>api/settings/oauth">
-                <i data-feather="lock"></i>
-                <span data-key="t-oauth-settings">OAuth Settings</span>
-            </a>
-        </li>
+                    <!-- API Settings -->
+                    <li class="<?php if (isset($active) && $active == 'api_settings') : ?>mm-active<?php endif ?>">
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i data-feather="code"></i>
+                            <span>API Settings</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="<?= base_url() ?>api/settings/mofh">MOFH Settings</a></li>
+                            <li><a href="<?= base_url() ?>api/settings/sitepro">SitePro Settings</a></li>
+                        </ul>
+                    </li>
 
-        <li class="<?php if (isset($active) and $active == 'domain') : ?>mm-active<?php endif ?>">
-            <a href="<?= base_url() ?>domain/list">
-                <i data-feather="globe"></i>
-                <span data-key="t-domain">Domain Extensions</span>
-            </a>
-        </li>
-    </ul>
-</div>
+                    <!-- Email Settings -->
+                    <li class="<?php if (isset($active) && $active == 'email_settings') : ?>mm-active<?php endif ?>">
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i data-feather="mail"></i>
+                            <span>Email Settings</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="<?= base_url() ?>api/settings/smtp">SMTP Settings</a></li>
+                            <li><a href="<?= base_url() ?>email/templates">Email Templates</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Security Settings -->
+                    <li class="<?php if (isset($active) && strpos($active, '_settings') !== false) : ?>mm-active<?php endif ?>">
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i data-feather="shield"></i>
+                            <span>Security</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="<?= base_url() ?>api/settings/ssl">SSL Settings</a></li>
+                            <li><a href="<?= base_url() ?>api/settings/captcha">Captcha Settings</a></li>
+                            <li><a href="<?= base_url() ?>api/settings/oauth">OAuth Settings</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Domain Management -->
+                    <li class="<?php if (isset($active) && $active == 'domain') : ?>mm-active<?php endif ?>">
+                        <a href="<?= base_url() ?>domain/list">
+                            <i data-feather="globe"></i>
+                            <span>Domain Extensions</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

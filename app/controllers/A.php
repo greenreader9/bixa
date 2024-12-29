@@ -3862,6 +3862,92 @@ public function edit_html($id = null) {
     redirect('admin/html');
 }
   
+  // Add these functions to Admin controller
+
+function ads() {
+    if(!$this->admin->is_logged()) {
+        redirect('admin/login');
+        return;
+    }
+    
+    $data['title'] = 'Manage Ads';
+    $data['active'] = 'ads';
+    
+    // Load ads model
+    $this->load->model('ads');
+    $data['ads'] = $this->ads->get_all();
+    
+    // Load views
+    $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
+    $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
+    $this->load->view($this->base->get_template().'/page/admin/ads');
+    $this->load->view($this->base->get_template().'/page/includes/admin/footer');
+}
+
+function edit_ad($id = null) {
+    if(!$this->admin->is_logged()) {
+        redirect('admin/login');
+        return;
+    }
+    
+    $this->load->model('ads');
+    
+    // Handle form submission
+    if($this->input->post('submit')) {
+        $data = [
+            'name' => $this->input->post('name'),
+            'content' => $this->input->post('content'), 
+            'placement' => $this->input->post('placement'),
+            'status' => $this->input->post('status')
+        ];
+        
+        if($id) {
+            $res = $this->ads->update($id, $data);
+            $msg = 'Ad updated successfully';
+        } else {
+            $res = $this->ads->create($data);
+            $msg = 'Ad created successfully';
+        }
+        
+        if($res) {
+            $this->session->set_flashdata('msg', json_encode([1, $msg]));
+            redirect('admin/ads');
+        } else {
+            $this->session->set_flashdata('msg', json_encode([0, 'Failed to save ad']));
+            redirect('admin/edit_ad/'.($id ? $id : ''));
+        }
+        return;
+    }
+    
+    // Load view
+    $data['title'] = $id ? 'Edit Ad' : 'Add New Ad';
+    $data['active'] = 'ads';
+    $data['ad'] = $id ? $this->ads->get($id) : null;
+    
+    $this->load->view($this->base->get_template().'/page/includes/admin/header', $data);
+    $this->load->view($this->base->get_template().'/page/includes/admin/navbar');
+    $this->load->view($this->base->get_template().'/page/admin/edit_ad');
+    $this->load->view($this->base->get_template().'/page/includes/admin/footer');
+}
+
+function delete_ad($id) {
+    if(!$this->admin->is_logged()) {
+        redirect('admin/login');
+        return;
+    }
+
+    $this->load->model('ads');
+    $res = $this->ads->delete($id);
+    
+    if($res) {
+        $this->session->set_flashdata('msg', json_encode([1, 'Ad deleted successfully']));
+    } else {
+        $this->session->set_flashdata('msg', json_encode([0, 'Failed to delete ad']));
+    }
+    
+    redirect('admin/ads');
+}
+  
 }
 
 

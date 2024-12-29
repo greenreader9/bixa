@@ -125,3 +125,7 @@ $route['tools/wordpress'] = 'u/wordpress_tools';
 $route['cloudflare/settings'] = 'u/cloudflare_settings';
 $route['cloudflare/zones'] = 'u/cloudflare_zones';
 $route['manage_dns/(:any)'] = 'u/manage_dns/$1';
+$route['admin/ads'] = 'a/ads';
+$route['admin/edit_ad'] = 'a/edit_ad'; 
+$route['admin/edit_ad/(:num)'] = 'a/edit_ad/$1';
+$route['admin/delete_ad/(:num)'] = 'a/delete_ad/$1';
