@@ -32,3 +32,4 @@ $lang['community_forum'] = 'Community Forum';
 $lang['domain_tools'] = 'Domain Tools';
 $lang['connection_details'] = 'Connection Details';
 $lang['login_to_filemanager'] = 'Login To Filemanager';
+$lang['free_accounts'] = 'Free Accounts';

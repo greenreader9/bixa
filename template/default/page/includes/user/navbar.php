@@ -96,7 +96,7 @@
                 <li class="menu-title" data-key="t-menu"></li>
 
                 <li>
-                    <a href="<?= base_url() ?>">
+                    <a href="<?= base_url() ?>user">
                         <i data-feather="home"></i>
                         <span data-key="t-dashboard"><?= $this->base->text('dashboard', 'heading') ?></span>
                     </a>
