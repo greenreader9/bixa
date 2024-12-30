@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 29, 2024 at 05:27 PM
+-- Generation Time: Dec 30, 2024 at 07:12 AM
 -- Server version: 11.7.1-MariaDB-log
 -- PHP Version: 8.1.10
 
@@ -77,6 +77,13 @@ CREATE TABLE `is_acme` (
   `acme_status` varchar(8) NOT NULL,
   `acme_dns` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `is_acme`
+--
+
+INSERT INTO `is_acme` (`acme_id`, `acme_letsencrypt`, `acme_zerossl`, `acme_googletrust`, `acme_status`, `acme_dns`) VALUES
+('xera_acme', '', 'not-set', 'not-set', 'inactive', '');
 
 -- --------------------------------------------------------
 
