@@ -77,6 +77,8 @@ Information shown below was last updated in December 2024 and may not be accurat
 ### 🤔 Help
 You can [open an issue here](https://github.com/bixacloud/bixa/issues/new) if you have discovered a bug or have an issue. Please ensure your topic has not been previously discussed, if it has, please contribute to that discussion instead of creating a new one if possible.
 
+Join our Telegram group at [BixaCloud](https://t.me/bixacloud) for discussions, bug reports, and community support. Please note that English is the primary language for communication.
+
 ### 👍 Like Bixa?
 If you like project Bixa please donate [here](https://bixa.app/DONATE.md).
 
