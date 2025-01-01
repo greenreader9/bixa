@@ -18,15 +18,7 @@
                 </div>
             </div>
 
-            <!-- Flash Messages -->
-            <?php if($this->session->flashdata('msg')): ?>
-                <?php $msg = json_decode($this->session->flashdata('msg'), true); ?>
-                <div class="alert alert-<?= $msg[0] ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-                    <?= $msg[1] ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-
+            
             <!-- DNS Records Card -->
             <div class="card">
                 <div class="card-body">
