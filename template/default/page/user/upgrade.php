@@ -137,7 +137,7 @@
                                                         </ul>
 
                                                         <div class="mt-4">
-                                                            <a href="https://ifastnet.com/portal/?aff=<?= get_aff_id() ?>" 
+                                                            <a href="https://ifastnet.com/portal/cart.php?a=add&pid=78&aff=<?= get_aff_id() ?>" 
                                                                class="btn btn-primary w-100">Upgrade Now</a>
                                                         </div>
                                                     </div>
@@ -164,7 +164,7 @@
                                                         </ul>
 
                                                         <div class="mt-4">
-                                                            <a href="https://ifastnet.com/portal/?aff=<?= get_aff_id() ?>" 
+                                                            <a href="https://ifastnet.com/portal/cart.php?a=add&pid=3&aff=<?= get_aff_id() ?>" 
                                                                class="btn btn-primary w-100">Upgrade Now</a>
                                                         </div>
                                                     </div>
@@ -190,7 +190,7 @@
                                                         </ul>
 
                                                         <div class="mt-4">
-                                                            <a href="https://ifastnet.com/portal/?aff=<?= get_aff_id() ?>" 
+                                                            <a href="https://ifastnet.com/portal/cart.php?a=add&pid=4&aff=<?= get_aff_id() ?>" 
                                                                class="btn btn-primary w-100">Upgrade Now</a>
                                                         </div>
                                                     </div>

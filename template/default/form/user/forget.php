@@ -26,7 +26,7 @@
                                         <input type="email" name="email" class="form-control" placeholder="<?= $this->base->text('email_address', 'label') ?>">
                                     </div>
                                     <div class="mb-3">
-                                        <input type="submit" class="btn btn-primary w-100 waves-effect waves-light" name="forget" value="<?= $this->base->text('send_me_link', 'button') ?>">
+                                        <input type="submit" class="btn btn-primary w-100 waves-effect waves-light" name="forget" value="<?= $this->base->text('reset_password', 'button') ?>">
                                     </div>
                                 </form>
 
@@ -36,7 +36,6 @@
                                         <a href="<?= base_url();?>login" class="text-primary fw-semibold">
                                             <?= $this->base->text('send_me_back', 'heading') ?>
                                         </a> 
-                                        <?= $this->base->text('to_screen', 'heading') ?>
                                     </p>
                                 </div>
                             </div>

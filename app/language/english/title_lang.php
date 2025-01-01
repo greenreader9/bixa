@@ -25,3 +25,4 @@ $lang['html_css'] = 'HTML/CSS Tools';
 $lang['base64'] = 'Base 64 Encode/Decode';
 $lang['wp'] = 'Wordpress pass hash gen';
 $lang['tools'] = 'Tools';
+

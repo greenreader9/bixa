@@ -33,3 +33,6 @@ $lang['domain_tools'] = 'Domain Tools';
 $lang['connection_details'] = 'Connection Details';
 $lang['login_to_filemanager'] = 'Login To Filemanager';
 $lang['free_accounts'] = 'Free Accounts';
+$lang['account'] = 'Account';
+$lang['forget_it'] = 'Remember it?';
+$lang['send_me_back'] = 'Back to Login';
