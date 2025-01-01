@@ -5,25 +5,53 @@
 
         <!-- Footer -->
         <footer class="footer">
-		<?php  
-		if(isset($_SESSION['msg'])){
-			$msg = json_decode($_SESSION['msg'], true);
-			if($msg[0] == 0)
-			{
-				$class = 'danger';
-			}
-			else
-			{
-				$class = 'success';
-			}
-			$message = $msg[1];
-			echo '<div class="alert alert-'.$class.' alert-dismissible" role="alert">
-				'.$message.'
-				<a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-				</div>';
-			unset($_SESSION['msg']);
-		}
-		?>
+<?php if(isset($_SESSION['msg'])){ 
+    $msg = json_decode($_SESSION['msg'], true); 
+    $type = ($msg[0] == 0) ? 'error' : 'success';
+    $message = $msg[1];
+    $isLongMessage = strlen($message) > 100;
+?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: '<?php echo $type ?>',
+            html: '<?php echo addslashes($message) ?>',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: <?php echo $isLongMessage ? 'true' : 'false' ?>,
+            confirmButtonText: 'OK',
+            timer: <?php echo $isLongMessage ? 'null' : '3000' ?>,
+            width: 'auto', // Giảm width xuống
+            customClass: {
+                popup: <?php echo $isLongMessage ? "'error-toast'" : "'normal-toast'" ?>,
+                confirmButton: 'toast-confirm-button'
+            }
+        });
+    });
+    </script>
+
+    <style>
+    .error-toast {
+        font-size: 13px !important;
+        padding: 15px 20px !important;
+        white-space: pre-wrap !important; 
+        word-wrap: break-word !important;
+        background-color: #fef0f0 !important;
+        color: #990000 !important;
+    }
+    .error-toast .swal2-html-container {
+        margin: 5px 0 10px 0 !important; /* Thêm margin bottom để tách nội dung và nút */
+        text-align: left !important;
+    }
+    .toast-confirm-button {
+        margin-top: 5px !important;
+        min-width: 60px !important;
+    }
+    </style>
+<?php 
+    unset($_SESSION['msg']); 
+} ?>
+
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6">
@@ -61,6 +89,7 @@
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-world-mill-en.js"></script>
         <!-- dashboard init -->
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/js/pages/dashboard.init.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/js/app.js"></script>
     </body>

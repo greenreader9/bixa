@@ -5,25 +5,27 @@
 
         <!-- Footer -->
         <footer class="footer">
-		<?php  
-		if(isset($_SESSION['msg'])){
-			$msg = json_decode($_SESSION['msg'], true);
-			if($msg[0] == 0)
-			{
-				$class = 'danger';
-			}
-			else
-			{
-				$class = 'success';
-			}
-			$message = $msg[1];
-			echo '<div class="alert alert-'.$class.' alert-dismissible" role="alert">
-				'.$message.'
-				<a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-				</div>';
-			unset($_SESSION['msg']);
-		}
-		?>
+		<?php if(isset($_SESSION['msg'])){ 
+    $msg = json_decode($_SESSION['msg'], true); 
+    $type = ($msg[0] == 0) ? 'error' : 'success';
+    $message = $msg[1];
+?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: '<?php echo $type ?>',
+            title: '<?php echo $message ?>',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    });
+    </script>
+<?php 
+    unset($_SESSION['msg']); 
+} ?>
+
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6">
@@ -61,6 +63,7 @@
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-world-mill-en.js"></script>
         <!-- dashboard init -->
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/js/pages/dashboard.init.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script src="<?= base_url()?>assets/<?= $this->base->get_template() ?>/js/app.js"></script>
     </body>
