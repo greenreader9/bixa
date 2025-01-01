@@ -2179,45 +2179,29 @@ public function manage_dns($domain = null) {
     $this->load->view($this->base->get_template().'/page/includes/user/footer');
 }
 private function _handle_add_dns_record($zone_id, $domain) {
-    log_message('debug', '--- Add DNS Record Start ---');
-    log_message('debug', 'POST data: ' . json_encode($_POST));
-
-    // Validate form data
-    $type = $this->input->post('type');
-    $name = $this->input->post('name');
-    $content = $this->input->post('content');
-    $ttl = (int)$this->input->post('ttl');
-    $proxied = $this->input->post('proxied') ? true : false;
-
-    if(!$type || !$name || !$content) {
-        $this->session->set_flashdata('msg', json_encode([0, 'Please fill all required fields']));
-        redirect("manage_dns/$domain");
-        return;
-    }
-
-    // Format name
-    if($name === '@') {
-        $name = $domain;
-    } else {
-        $name = $name . '.' . $domain;
-    }
-
-    log_message('debug', 'Adding DNS Record: ' . json_encode([
-        'type' => $type,
-        'name' => $name,
-        'content' => $content,
-        'ttl' => $ttl,
-        'proxied' => $proxied
-    ]));
-
     try {
+        $type = $this->input->post('type');
+        $name = $this->input->post('name');
+        $content = $this->input->post('content');
+        $ttl = (int)$this->input->post('ttl');
+        $proxied = $this->input->post('proxied') ? true : false;
+        $priority = $this->input->post('priority') ? (int)$this->input->post('priority') : null;
+
+        // Format name
+        if($name === '@') {
+            $name = $domain;
+        } else {
+            $name = $name . '.' . $domain;
+        }
+
         $result = $this->cloudflare->add_dns_record(
-            $zone_id, 
+            $zone_id,
             $type,
             $name,
             $content,
             $ttl,
-            $proxied
+            $proxied,
+            $priority
         );
 
         if($result) {
@@ -2225,67 +2209,15 @@ private function _handle_add_dns_record($zone_id, $domain) {
         } else {
             $this->session->set_flashdata('msg', json_encode([0, 'Failed to add DNS record']));
         }
+
     } catch(Exception $e) {
-        log_message('error', 'Add DNS Error: ' . $e->getMessage());
         $this->session->set_flashdata('msg', json_encode([0, $e->getMessage()]));
     }
 
     redirect("manage_dns/$domain");
-}private function _handle_update_dns_record($zone_id, $domain) {
-    log_message('debug', '--- Update DNS Record Start ---');
-    log_message('debug', 'Update data: ' . json_encode($_POST));
+}
 
-    try {
-        // Get form data
-        $record_id = $this->input->post('record_id');
-        $type = $this->input->post('type');
-        $name = $this->input->post('name');
-        $content = $this->input->post('content');
-        $ttl = (int)$this->input->post('ttl');
-        $proxied = $this->input->post('proxied') ? true : false;
-
-        // Format name properly
-        if($name === '@') {
-            $name = $domain;
-        } else {
-            $name = $name . '.' . $domain;
-        }
-
-        log_message('debug', 'Formatted update data: ' . json_encode([
-            'record_id' => $record_id,
-            'type' => $type,
-            'name' => $name,
-            'content' => $content,
-            'ttl' => $ttl,
-            'proxied' => $proxied
-        ]));
-
-        $result = $this->cloudflare->update_dns_record(
-            $zone_id,
-            $record_id,
-            $type,
-            $name,
-            $content,
-            $ttl,
-            $proxied
-        );
-
-        log_message('debug', 'Update result: ' . json_encode($result));
-
-        if($result) {
-            $this->session->set_flashdata('msg', json_encode([1, 'DNS record updated successfully']));
-        } else {
-            $this->session->set_flashdata('msg', json_encode([0, 'Failed to update DNS record']));
-        }
-
-    } catch(Exception $e) {
-        log_message('error', 'Update DNS Error: ' . $e->getMessage());
-        $this->session->set_flashdata('msg', json_encode([0, 'Error: ' . $e->getMessage()]));
-    }
-
-    log_message('debug', '--- Update DNS Record End ---');
-    redirect("manage_dns/$domain");
-}private function _handle_delete_dns_record($zone_id, $domain) {
+  private function _handle_delete_dns_record($zone_id, $domain) {
     // Debug
     log_message('debug', '--- DELETE DNS RECORD START ---');
     log_message('debug', 'POST data: ' . json_encode($_POST));

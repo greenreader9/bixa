@@ -138,72 +138,36 @@ class Cloudflare extends CI_Model {
 }
 
     // Add new DNS record
-public function add_dns_record($zone_id, $type, $name, $content, $ttl = 1, $proxied = true) {
+public function add_dns_record($zone_id, $type, $name, $content, $ttl = 1, $proxied = false, $priority = null) {
     if(!$this->init_api()) {
-        log_message('error', 'Failed to initialize Cloudflare API');
         return false;
     }
 
     try {
         $dns = new \Cloudflare\API\Endpoints\DNS($this->adapter);
 
-        log_message('debug', 'Making Cloudflare API add request: ' . json_encode([
-            'zone_id' => $zone_id,
-            'type' => $type,
-            'name' => $name,
-            'content' => $content,
-            'ttl' => $ttl,
-            'proxied' => $proxied
-        ]));
+        // Set priority dựa trên input hoặc default cho MX
+        $recordPriority = '';
+        if($priority !== null) {
+            $recordPriority = (string)$priority;  // Convert to string for API
+        } elseif($type === 'MX') {
+            $recordPriority = '10'; // Default cho MX nếu không set
+        }
 
-        // Thay đổi ở đây: truyền các tham số riêng lẻ thay vì array
-        $result = $dns->addRecord($zone_id, $type, $name, $content, $ttl, $proxied);
+        $result = $dns->addRecord(
+            $zone_id,
+            $type,
+            $name,
+            $content,
+            $ttl,
+            $proxied,
+            $recordPriority
+        );
 
-        log_message('debug', 'Cloudflare API add response: ' . json_encode($result));
         return $result;
 
     } catch(Exception $e) {
         log_message('error', 'Error adding DNS record: ' . $e->getMessage());
-        throw $e;
-    }
-}public function update_dns_record($zone_id, $record_id, $type, $name, $content, $ttl = 1, $proxied = true) {
-    if(!$this->init_api()) {
-        log_message('error', 'Failed to initialize Cloudflare API');
-        return false;
-    }
-
-    try {
-        $dns = new \Cloudflare\API\Endpoints\DNS($this->adapter);
-
-        log_message('debug', 'Making Cloudflare API update request: ' . json_encode([
-            'zone_id' => $zone_id,
-            'record_id' => $record_id,
-            'type' => $type,
-            'name' => $name,
-            'content' => $content,
-            'ttl' => $ttl,
-            'proxied' => $proxied
-        ]));
-
-        // Make API request
-        $result = $dns->updateRecordDetails(
-            $zone_id, 
-            $record_id,
-            [
-                'type' => $type,
-                'name' => $name,
-                'content' => $content,
-                'ttl' => $ttl,
-                'proxied' => $proxied
-            ]
-        );
-
-        log_message('debug', 'Cloudflare API response: ' . json_encode($result));
-        
-        return $result;
-
-    } catch(Exception $e) {
-        log_message('error', 'Error updating DNS record: ' . $e->getMessage());
         throw $e;
     }
 }
