@@ -105,7 +105,7 @@
                     </button>
                     <form method="post" class="d-inline-block" 
                           onsubmit="return confirm('Are you sure you want to delete this record?')">
-                        <input type="hidden" name="xera__csrf_token" value="<?= $this->security->get_csrf_hash() ?>">
+                        <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
                         <input type="hidden" name="delete_record" value="1">
                         <input type="hidden" name="record_id" value="<?= $record->id ?>">
                         <button type="submit" class="btn btn-danger btn-sm">
@@ -138,7 +138,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="post" id="addRecordForm">
-                <input type="hidden" name="xera__csrf_token" value="<?= $this->security->get_csrf_hash() ?>">
+                <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
                 <input type="hidden" name="add_record" value="1">
 
                 <div class="modal-header">
@@ -224,7 +224,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="post">
-                <input type="hidden" name="xera__csrf_token" value="<?= $this->security->get_csrf_hash() ?>">
+                <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
                 <input type="hidden" name="update_record" value="1">
                 <input type="hidden" name="record_id" id="edit_record_id">
 
