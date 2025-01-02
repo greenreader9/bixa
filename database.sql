@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 30, 2024 at 07:12 AM
+-- Generation Time: Jan 02, 2025 at 05:00 PM
 -- Server version: 11.7.1-MariaDB-log
 -- PHP Version: 8.1.10
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `demo`
+-- Database: `database`
 --
 
 -- --------------------------------------------------------
@@ -275,7 +275,9 @@ CREATE TABLE `is_oauth` (
 INSERT INTO `is_oauth` (`oauth_id`, `oauth_client`, `oauth_secret`, `oauth_endpoint`, `oauth_status`) VALUES
 ('github', '', '', 'https://api.github.com/user', 'inactive'),
 ('google', '', '', 'https://www.googleapis.com/oauth2/v2/userinfo', 'inactive'),
-('facebook', '', '', 'https://graph.facebook.com/me', 'inactive');
+('facebook', '', '', 'https://graph.facebook.com/me', 'inactive'),
+('discord', '', '', 'https://discord.com/api/users/@me', 'inactive'),
+('microsoft', '', '', 'https://graph.microsoft.com/v1.0/me', 'inactive');
 
 -- --------------------------------------------------------
 

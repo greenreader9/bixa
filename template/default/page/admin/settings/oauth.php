@@ -27,6 +27,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" data-bs-toggle="tab" href="#facebook" role="tab">Facebook</a>
                                 </li>
+                              <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#discord" role="tab">Discord</a>
+</li>
+<li class="nav-item">  
+    <a class="nav-link" data-bs-toggle="tab" href="#microsoft" role="tab">Microsoft</a>
+</li>
                             </ul>
 
                             <div class="tab-content p-3">
@@ -122,6 +128,65 @@
                                         </div>
                                     </form>
                                 </div>
+                  <div class="tab-pane" id="discord" role="tabpanel">
+    <?= form_open('api/settings/oauth') ?>
+        <input type="hidden" name="service" value="discord">
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="form-label">Client ID</label>
+                <input type="text" name="client" class="form-control mb-2" value="<?= $this->oauth->get_client('discord') ?>">
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Client Secret</label>
+                <input type="text" name="secret" class="form-control mb-2" value="<?= $this->oauth->get_secret('discord') ?>">
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Callback URL</label>
+                <input type="text" class="form-control mb-2" value="<?= base_url('c/discord_oauth') ?>" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control mb-2">
+                    <option value="1" <?= $this->oauth->get_status('discord') === 'active' ? 'selected' : '' ?>>Active</option>
+                    <option value="0" <?= $this->oauth->get_status('discord') !== 'active' ? 'selected' : '' ?>>Inactive</option>
+                </select>
+            </div>
+            <div class="col-sm-12">
+                <input type="submit" name="update_oauth" value="Update Settings" class="btn btn-primary waves-effect waves-light">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="tab-pane" id="microsoft" role="tabpanel">
+    <?= form_open('api/settings/oauth') ?>
+        <input type="hidden" name="service" value="microsoft"> 
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="form-label">Client ID</label>
+                <input type="text" name="client" class="form-control mb-2" value="<?= $this->oauth->get_client('microsoft') ?>">
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Client Secret</label>
+                <input type="text" name="secret" class="form-control mb-2" value="<?= $this->oauth->get_secret('microsoft') ?>">
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Callback URL</label>
+                <input type="text" class="form-control mb-2" value="<?= base_url('c/microsoft_oauth') ?>" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control mb-2">
+                    <option value="1" <?= $this->oauth->get_status('microsoft') === 'active' ? 'selected' : '' ?>>Active</option>
+                    <option value="0" <?= $this->oauth->get_status('microsoft') !== 'active' ? 'selected' : '' ?>>Inactive</option>
+                </select>
+            </div>
+            <div class="col-sm-12">
+                <input type="submit" name="update_oauth" value="Update Settings" class="btn btn-primary waves-effect waves-light">
+            </div>
+        </div>
+    </form>
+</div>
                             </div>
                         </div>
                     </div>
