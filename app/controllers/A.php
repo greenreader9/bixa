@@ -1849,14 +1849,12 @@ function api_settings()
             // Set endpoint theo provider
 
             $endpoints = [
-
-                'github' => 'https://api.github.com/user',
-
-                'google' => 'https://www.googleapis.com/oauth2/v2/userinfo',
-
-                'facebook' => 'https://graph.facebook.com/me'  
-
-            ];
+            'github' => 'https://api.github.com/user',
+            'google' => 'https://www.googleapis.com/oauth2/v2/userinfo',
+            'facebook' => 'https://graph.facebook.com/me',
+            'discord' => 'https://discord.com/api/users/@me',
+            'microsoft' => 'https://graph.microsoft.com/v1.0/me'
+        ];
 
 
 

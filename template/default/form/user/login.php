@@ -115,10 +115,29 @@
             </a>
         </div>
     <?php endif; ?>
+  <?php if($this->oauth->is_active('discord')): ?>
+    <div class="mb-2">
+        <a href="https://discord.com/api/oauth2/authorize?client_id=<?= $this->oauth->get_client('discord') ?>&redirect_uri=<?= urlencode(base_url('c/discord_oauth')) ?>&response_type=code&scope=identify%20email"
+           class="btn btn-secondary w-100">
+            <i data-feather="message-circle" class="icon-sm align-middle me-2"></i>
+            <?= $this->base->text('discord', 'button') ?>
+        </a>
+    </div>
+<?php endif; ?>
+
+<?php if($this->oauth->is_active('microsoft')): ?>
+    <div class="mb-2">
+        <a href="https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=<?= $this->oauth->get_client('microsoft') ?>&redirect_uri=<?= urlencode(base_url('c/microsoft_oauth')) ?>&response_type=code&scope=User.Read%20email%20offline_access"
+           class="btn btn-info w-100">
+            <i data-feather="grid" class="icon-sm align-middle me-2"></i>
+            <?= $this->base->text('microsoft', 'button') ?>
+        </a>
+    </div>
+<?php endif; ?>
 </div>
 
 <!-- Add divider if any OAuth provider is active -->
-<?php if($this->oauth->is_active('github') || $this->oauth->is_active('google') || $this->oauth->is_active('facebook')): ?>
+<?php if($this->oauth->is_active('github') || $this->oauth->is_active('google') || $this->oauth->is_active('discord') || $this->oauth->is_active('microsoft') || $this->oauth->is_active('facebook')): ?>
     
 <?php endif; ?>
 
